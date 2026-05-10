@@ -712,6 +712,13 @@ a:focus-visible {
   margin: 0;
 }
 
+:lang(ja) .empty-state h1,
+:lang(ja) .empty-state p {
+  word-break: keep-all;
+  overflow-wrap: normal;
+  line-break: strict;
+}
+
 .empty-drop-zone {
   width: min(640px, 100%);
   min-height: 260px;
