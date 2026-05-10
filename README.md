@@ -10,13 +10,14 @@ ChatLog Viewer は、ChatGPT などから出力した Markdown 形式のチャ�
 
 長いログでも、検索や発言一覧から目的の話題へ移動できます。
 
+ChatGPT Exporter は、ChatGPT の会話を Markdown などの形式で保存できる第三者製ブラウザ拡張です。
+このプロジェクトは ChatGPT Exporter および OpenAI とは無関係の個人用ビューアです。
+
 ## 使い方
 
 公開ページを開き、読みたい Markdown ファイルを読み込んでください。
 
-```text
-ここにPages公開ページのURLを追記
-```
+[https://libertycrown.github.io/chatlog-viewer/](https://libertycrown.github.io/chatlog-viewer/)
 
 ### PCの場合
 

@@ -11,13 +11,14 @@ Markdown files are processed entirely in your browser, and local files are not u
 
 For long logs, you can use search and the message list to jump to the topic you want.
 
+ChatGPT Exporter is a third-party browser extension for exporting ChatGPT conversations to formats such as Markdown.
+This project is an independent personal viewer and is not affiliated with ChatGPT Exporter or OpenAI.
+
 ## Usage
 
 Open the hosted page, then load the Markdown file you want to read.
 
-```text
-Pages URL will be added here
-```
+[https://libertycrown.github.io/chatlog-viewer/](https://libertycrown.github.io/chatlog-viewer/)
 
 ### On desktop
 
