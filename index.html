@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="system">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Local-first Markdown chat log viewer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https: http:; object-src 'none'; base-uri 'none'; form-action 'none';">
+  <meta name="theme-color" content="#f6f7f5">
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>ChatLog Viewer</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="icon-button menu-button" id="sidebarToggleBtn" type="button" aria-controls="sidebar" aria-expanded="false" data-i18n-attr="aria-label:menu;title:menu">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.9 6.1h14.2a.9.9 0 1 1 0 1.8H4.9a.9.9 0 1 1 0-1.8Zm0 5h14.2a.9.9 0 1 1 0 1.8H4.9a.9.9 0 1 1 0-1.8Zm0 5h14.2a.9.9 0 1 1 0 1.8H4.9a.9.9 0 1 1 0-1.8Z"/></svg>
+      </button>
+      <div class="brand" aria-label="ChatLog Viewer">
+        <img src="assets/icon.svg" width="32" height="32" alt="">
+        <div>
+          <div class="brand-title">ChatLog Viewer</div>
+          <div class="brand-subtitle" data-i18n="brandSubtitle">Local Markdown reader</div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="button button-primary" id="openFileBtn" type="button" data-i18n-attr="aria-label:openFile;title:openFile">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h4.1c.7 0 1.3.3 1.8.7L14.7 6h2.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-11Zm2.5-.7a.7.7 0 0 0-.7.7v11c0 .4.3.7.7.7h11c.4 0 .7-.3.7-.7v-8c0-.4-.3-.7-.7-.7H14c-.2 0-.5-.1-.6-.3l-2.3-2.3a.8.8 0 0 0-.5-.2H6.5Z"/></svg>
+          <span data-i18n="openFile">Open Markdown</span>
+        </button>
+        <input id="fileInput" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden>
+
+        <button class="button button-quiet top-install" id="installBtn" type="button" data-i18n-attr="aria-label:install;title:install" hidden>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11.1 3.9a.9.9 0 0 1 1.8 0v8.5l2.8-2.8a.9.9 0 1 1 1.3 1.3l-4.4 4.3a.9.9 0 0 1-1.2 0L7 10.9a.9.9 0 1 1 1.3-1.3l2.8 2.8V3.9ZM5 16.6a.9.9 0 0 1 .9.9v1.1c0 .4.3.7.7.7h10.8c.4 0 .7-.3.7-.7v-1.1a.9.9 0 0 1 1.8 0v1.1a2.5 2.5 0 0 1-2.5 2.5H6.6a2.5 2.5 0 0 1-2.5-2.5v-1.1a.9.9 0 0 1 .9-.9Z"/></svg>
+          <span data-i18n="install">Install</span>
+        </button>
+
+        <label class="select-wrap top-language">
+          <span class="sr-only" data-i18n="language">Language</span>
+          <select id="languageSelect" data-i18n-attr="aria-label:language"></select>
+        </label>
+
+        <div class="segmented top-theme" role="group" aria-label="Theme" data-i18n-attr="aria-label:theme">
+          <button type="button" class="icon-button" data-theme-choice="system" title="System">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.8 5A2.8 2.8 0 0 1 7.6 2.2h8.8A2.8 2.8 0 0 1 19.2 5v6.5a2.8 2.8 0 0 1-2.8 2.8h-3.5v2.1h2.4a.9.9 0 1 1 0 1.8H8.7a.9.9 0 1 1 0-1.8h2.4v-2.1H7.6a2.8 2.8 0 0 1-2.8-2.8V5Zm2.8-1A1 1 0 0 0 6.6 5v6.5a1 1 0 0 0 1 1h8.8a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H7.6Z"/></svg>
+          </button>
+          <button type="button" class="icon-button" data-theme-choice="light" title="Light">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 6.8a5.2 5.2 0 1 1 0 10.4 5.2 5.2 0 0 1 0-10.4Zm0 1.8a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8ZM12 2.2a.9.9 0 0 1 .9.9v1.3a.9.9 0 1 1-1.8 0V3.1a.9.9 0 0 1 .9-.9Zm0 16.5a.9.9 0 0 1 .9.9v1.3a.9.9 0 1 1-1.8 0v-1.3a.9.9 0 0 1 .9-.9ZM3.1 11.1h1.3a.9.9 0 1 1 0 1.8H3.1a.9.9 0 1 1 0-1.8Zm16.5 0h1.3a.9.9 0 1 1 0 1.8h-1.3a.9.9 0 1 1 0-1.8ZM5.4 4.1l.9.9A.9.9 0 0 1 5 6.3l-.9-.9a.9.9 0 0 1 1.3-1.3Zm12.3 12.3.9.9a.9.9 0 1 1-1.3 1.3l-.9-.9a.9.9 0 0 1 1.3-1.3Zm.9-12.3a.9.9 0 0 1 0 1.3l-.9.9A.9.9 0 1 1 16.4 5l.9-.9a.9.9 0 0 1 1.3 0ZM6.3 16.4a.9.9 0 0 1 0 1.3l-.9.9a.9.9 0 0 1-1.3-1.3l.9-.9a.9.9 0 0 1 1.3 0Z"/></svg>
+          </button>
+          <button type="button" class="icon-button" data-theme-choice="dark" title="Dark">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.3 14.3a.9.9 0 0 1 1 1.2 9.5 9.5 0 1 1-12.8-12.8.9.9 0 0 1 1.2 1 7.7 7.7 0 0 0 10.6 10.6ZM7.5 5.3a7.7 7.7 0 1 0 11.2 11.2A9.5 9.5 0 0 1 7.5 5.3Z"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <nav class="sidebar-rail" id="sidebarRail" aria-label="Quick actions" data-i18n-attr="aria-label:quickActions">
+        <button class="icon-button" id="sidebarExpandBtn" type="button" data-i18n-attr="aria-label:showSidebar;title:showSidebar">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5v-13Zm4.8-.7H6.5a.7.7 0 0 0-.7.7v13c0 .4.3.7.7.7h2.3V4.8Zm1.8 14.4h6.9c.4 0 .7-.3.7-.7v-13c0-.4-.3-.7-.7-.7h-6.9v14.4Z"/></svg>
+        </button>
+        <button class="icon-button" id="railSearchBtn" type="button" data-i18n-attr="aria-label:search;title:search">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10.8 4.2a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2Zm0 1.8a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm5 9.2 3.7 3.7a.9.9 0 1 1-1.3 1.3l-3.7-3.7a.9.9 0 0 1 1.3-1.3Z"/></svg>
+        </button>
+      </nav>
+      <aside class="sidebar" id="sidebar" aria-label="Library">
+        <div class="sidebar-desktop-header">
+          <strong data-i18n="sidebarTitle">Library</strong>
+          <button class="icon-button" id="sidebarCollapseBtn" type="button" data-i18n-attr="aria-label:hideSidebar;title:hideSidebar">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5v-13Zm4.8-.7H6.5a.7.7 0 0 0-.7.7v13c0 .4.3.7.7.7h2.3V4.8Zm1.8 14.4h6.9c.4 0 .7-.3.7-.7v-13c0-.4-.3-.7-.7-.7h-6.9v14.4Zm4.9-10.1a.9.9 0 0 1 0 1.3L13.9 12l1.6 1.6a.9.9 0 1 1-1.3 1.3L12 12.6a.9.9 0 0 1 0-1.2l2.2-2.3a.9.9 0 0 1 1.3 0Z"/></svg>
+          </button>
+        </div>
+        <div class="sidebar-header">
+          <strong data-i18n="sidebarTitle">Library</strong>
+          <button class="icon-button drawer-open-file" id="drawerOpenFileBtn" type="button" data-i18n-attr="aria-label:openFile;title:openFile">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h4.1c.7 0 1.3.3 1.8.7L14.7 6h2.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-11Zm2.5-.7a.7.7 0 0 0-.7.7v11c0 .4.3.7.7.7h11c.4 0 .7-.3.7-.7v-8c0-.4-.3-.7-.7-.7H14c-.2 0-.5-.1-.6-.3l-2.3-2.3a.8.8 0 0 0-.5-.2H6.5Z"/></svg>
+          </button>
+          <button class="icon-button" id="sidebarCloseBtn" type="button" data-i18n-attr="aria-label:closeMenu;title:closeMenu">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.2 4.9a.9.9 0 0 0-1.3 1.3L10.7 12l-5.8 5.8a.9.9 0 1 0 1.3 1.3l5.8-5.8 5.8 5.8a.9.9 0 0 0 1.3-1.3L13.3 12l5.8-5.8a.9.9 0 1 0-1.3-1.3L12 10.7 6.2 4.9Z"/></svg>
+          </button>
+        </div>
+        <section class="panel filters-panel">
+          <div class="search-box">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10.8 4.2a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2Zm0 1.8a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm5 9.2 3.7 3.7a.9.9 0 1 1-1.3 1.3l-3.7-3.7a.9.9 0 0 1 1.3-1.3Z"/></svg>
+            <label class="sr-only" for="searchInput" data-i18n="search">Search</label>
+            <input id="searchInput" type="search" data-i18n-attr="placeholder:search">
+            <button class="search-clear-button" id="searchClearInlineBtn" type="button" data-i18n-attr="aria-label:clear;title:clear">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.2 4.9a.9.9 0 0 0-1.3 1.3L10.7 12l-5.8 5.8a.9.9 0 1 0 1.3 1.3l5.8-5.8 5.8 5.8a.9.9 0 0 0 1.3-1.3L13.3 12l5.8-5.8a.9.9 0 1 0-1.3-1.3L12 10.7 6.2 4.9Z"/></svg>
+            </button>
+          </div>
+
+          <div class="result-toolbar">
+            <span class="result-line" id="resultLine" data-i18n="searchResultsEmpty">Search results: 0</span>
+            <div class="result-actions">
+              <button class="mini-button" id="prevResultBtn" type="button" data-i18n-attr="aria-label:previousResult;title:previousResult" disabled>
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5.4a.9.9 0 0 1 .6.3l5 5a.9.9 0 1 1-1.2 1.2l-3.5-3.4v9.1a.9.9 0 1 1-1.8 0V8.5l-3.5 3.4a.9.9 0 1 1-1.2-1.2l5-5a.9.9 0 0 1 .6-.3Z"/></svg>
+              </button>
+              <button class="mini-button" id="nextResultBtn" type="button" data-i18n-attr="aria-label:nextResult;title:nextResult" disabled>
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 18.6a.9.9 0 0 1-.6-.3l-5-5a.9.9 0 1 1 1.2-1.2l3.5 3.4V6.4a.9.9 0 1 1 1.8 0v9.1l3.5-3.4a.9.9 0 1 1 1.2 1.2l-5 5a.9.9 0 0 1-.6.3Z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <label class="field">
+              <span data-i18n="role">Role</span>
+              <select id="roleFilter">
+                <option value="all" data-i18n="all">All</option>
+                <option value="prompt" data-i18n="prompt">Prompt</option>
+                <option value="response" data-i18n="response">Response</option>
+              </select>
+            </label>
+            <button class="button button-quiet" id="clearSearchBtn" type="button" data-i18n-attr="aria-label:resetFilters;title:resetFilters">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.2 4.9a.9.9 0 0 0-1.3 1.3L10.7 12l-5.8 5.8a.9.9 0 1 0 1.3 1.3l5.8-5.8 5.8 5.8a.9.9 0 0 0 1.3-1.3L13.3 12l5.8-5.8a.9.9 0 1 0-1.3-1.3L12 10.7 6.2 4.9Z"/></svg>
+              <span data-i18n="resetFilters">Reset filters</span>
+            </button>
+          </div>
+        </section>
+
+        <details class="panel advanced-panel" id="advancedPanel">
+          <summary data-i18n="advancedSettings">Advanced settings</summary>
+          <div class="advanced-content">
+            <div class="field-grid">
+              <label class="field">
+                <span data-i18n="encoding">Encoding</span>
+                <select id="encodingSelect">
+                  <option value="auto">Auto</option>
+                  <option value="utf-8">UTF-8</option>
+                  <option value="shift_jis">Shift_JIS</option>
+                  <option value="euc-jp">EUC-JP</option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="displayMode">Display</span>
+                <select id="densitySelect">
+                  <option value="comfortable" data-i18n="comfortable">Comfortable</option>
+                  <option value="compact" data-i18n="compact">Compact</option>
+                  <option value="chat" data-i18n="chat">Chat</option>
+                </select>
+              </label>
+            </div>
+
+            <form class="url-form" id="urlForm">
+              <label class="field">
+                <span data-i18n="urlLabel">Markdown URL</span>
+                <input id="urlInput" type="url" inputmode="url" placeholder="https://.../chat.md" autocomplete="off">
+              </label>
+              <button class="button button-secondary" type="submit">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 5.2a.9.9 0 1 1 0-1.8h5.1c.5 0 .9.4.9.9v5.1a.9.9 0 0 1-1.8 0V6.5l-8 8a.9.9 0 1 1-1.3-1.3l8-8H14ZM5.8 5.8v12.4h12.4v-4.5a.9.9 0 0 1 1.8 0v4.8c0 .8-.7 1.5-1.5 1.5h-13c-.8 0-1.5-.7-1.5-1.5v-13C4 4.7 4.7 4 5.5 4h4.8a.9.9 0 1 1 0 1.8H5.8Z"/></svg>
+                <span data-i18n="loadUrl">Load</span>
+              </button>
+            </form>
+
+            <div class="mobile-settings">
+              <label class="field">
+                <span data-i18n="language">Language</span>
+                <select id="drawerLanguageSelect" data-i18n-attr="aria-label:language"></select>
+              </label>
+              <div class="field">
+                <span data-i18n="theme">Theme</span>
+                <div class="segmented drawer-theme" role="group" aria-label="Theme" data-i18n-attr="aria-label:theme">
+                  <button type="button" class="icon-button" data-theme-choice="system" title="System">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.8 5A2.8 2.8 0 0 1 7.6 2.2h8.8A2.8 2.8 0 0 1 19.2 5v6.5a2.8 2.8 0 0 1-2.8 2.8h-3.5v2.1h2.4a.9.9 0 1 1 0 1.8H8.7a.9.9 0 1 1 0-1.8h2.4v-2.1H7.6a2.8 2.8 0 0 1-2.8-2.8V5Zm2.8-1A1 1 0 0 0 6.6 5v6.5a1 1 0 0 0 1 1h8.8a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H7.6Z"/></svg>
+                  </button>
+                  <button type="button" class="icon-button" data-theme-choice="light" title="Light">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 6.8a5.2 5.2 0 1 1 0 10.4 5.2 5.2 0 0 1 0-10.4Zm0 1.8a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8ZM12 2.2a.9.9 0 0 1 .9.9v1.3a.9.9 0 1 1-1.8 0V3.1a.9.9 0 0 1 .9-.9Zm0 16.5a.9.9 0 0 1 .9.9v1.3a.9.9 0 1 1-1.8 0v-1.3a.9.9 0 0 1 .9-.9ZM3.1 11.1h1.3a.9.9 0 1 1 0 1.8H3.1a.9.9 0 1 1 0-1.8Zm16.5 0h1.3a.9.9 0 1 1 0 1.8h-1.3a.9.9 0 1 1 0-1.8ZM5.4 4.1l.9.9A.9.9 0 0 1 5 6.3l-.9-.9a.9.9 0 0 1 1.3-1.3Zm12.3 12.3.9.9a.9.9 0 1 1-1.3 1.3l-.9-.9a.9.9 0 0 1 1.3-1.3Zm.9-12.3a.9.9 0 0 1 0 1.3l-.9.9A.9.9 0 1 1 16.4 5l.9-.9a.9.9 0 0 1 1.3 0ZM6.3 16.4a.9.9 0 0 1 0 1.3l-.9.9a.9.9 0 0 1-1.3-1.3l.9-.9a.9.9 0 0 1 1.3 0Z"/></svg>
+                  </button>
+                  <button type="button" class="icon-button" data-theme-choice="dark" title="Dark">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.3 14.3a.9.9 0 0 1 1 1.2 9.5 9.5 0 1 1-12.8-12.8.9.9 0 0 1 1.2 1 7.7 7.7 0 0 0 10.6 10.6ZM7.5 5.3a7.7 7.7 0 1 0 11.2 11.2A9.5 9.5 0 0 1 7.5 5.3Z"/></svg>
+                  </button>
+                </div>
+              </div>
+              <button class="button button-secondary mobile-install" id="drawerInstallBtn" type="button" data-i18n-attr="aria-label:install;title:install" hidden>
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11.1 3.9a.9.9 0 0 1 1.8 0v8.5l2.8-2.8a.9.9 0 1 1 1.3 1.3l-4.4 4.3a.9.9 0 0 1-1.2 0L7 10.9a.9.9 0 1 1 1.3-1.3l2.8 2.8V3.9ZM5 16.6a.9.9 0 0 1 .9.9v1.1c0 .4.3.7.7.7h10.8c.4 0 .7-.3.7-.7v-1.1a.9.9 0 0 1 1.8 0v1.1a2.5 2.5 0 0 1-2.5 2.5H6.6a2.5 2.5 0 0 1-2.5-2.5v-1.1a.9.9 0 0 1 .9-.9Z"/></svg>
+                <span data-i18n="install">Install</span>
+              </button>
+            </div>
+
+            <section class="advanced-stats" aria-live="polite">
+              <dl class="stats-grid">
+                <div>
+                  <dt data-i18n="messages">Messages</dt>
+                  <dd id="statMessages">0</dd>
+                </div>
+                <div>
+                  <dt data-i18n="turns">Turns</dt>
+                  <dd id="statTurns">0</dd>
+                </div>
+                <div>
+                  <dt data-i18n="characters">Chars</dt>
+                  <dd id="statChars">0</dd>
+                </div>
+              </dl>
+              <div class="status-line" id="statusLine" data-i18n="ready">Ready</div>
+            </section>
+          </div>
+        </details>
+
+        <nav class="message-nav" id="messageList" aria-label="Messages"></nav>
+      </aside>
+
+      <section class="reader" id="reader" aria-label="Conversation">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-drop-zone" id="emptyDropZone">
+            <img src="assets/icon.svg" width="72" height="72" alt="">
+            <h1 data-i18n="emptyTitle">Open a Markdown chat log</h1>
+            <p data-i18n="emptyBody">Files stay in this browser.</p>
+            <button class="button button-primary" id="emptyOpenFileBtn" type="button" data-i18n-attr="aria-label:openFile;title:openFile">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h4.1c.7 0 1.3.3 1.8.7L14.7 6h2.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-11Zm2.5-.7a.7.7 0 0 0-.7.7v11c0 .4.3.7.7.7h11c.4 0 .7-.3.7-.7v-8c0-.4-.3-.7-.7-.7H14c-.2 0-.5-.1-.6-.3l-2.3-2.3a.8.8 0 0 0-.5-.2H6.5Z"/></svg>
+              <span data-i18n="openFile">Open Markdown</span>
+            </button>
+            <span class="empty-formats" data-i18n="emptyFormats">ChatGPT Markdown / plain Markdown</span>
+          </div>
+        </div>
+
+        <article class="document" id="documentView" hidden>
+          <header class="document-header">
+            <div>
+              <p class="eyebrow" id="sourceLabel">Markdown</p>
+              <h1 id="docTitle">Untitled</h1>
+            </div>
+            <a class="button button-secondary" id="sourceLink" href="#" target="_blank" rel="noopener noreferrer" hidden>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 5.2a.9.9 0 1 1 0-1.8h5.1c.5 0 .9.4.9.9v5.1a.9.9 0 0 1-1.8 0V6.5l-8 8a.9.9 0 1 1-1.3-1.3l8-8H14ZM5.8 5.8v12.4h12.4v-4.5a.9.9 0 0 1 1.8 0v4.8c0 .8-.7 1.5-1.5 1.5h-13c-.8 0-1.5-.7-1.5-1.5v-13C4 4.7 4.7 4 5.5 4h4.8a.9.9 0 1 1 0 1.8H5.8Z"/></svg>
+              <span data-i18n="openSource">Open source</span>
+            </a>
+          </header>
+
+          <details class="meta-details" id="metaDetails">
+            <summary data-i18n="showLogInfo">Show log info</summary>
+            <dl class="meta-grid" id="metaGrid"></dl>
+          </details>
+          <div class="conversation" id="conversation"></div>
+          <div class="empty-results" id="emptyResults" hidden>
+            <h2 data-i18n="noMatches">No matches</h2>
+          </div>
+        </article>
+      </section>
+    </main>
+    <div class="sidebar-scrim" id="sidebarScrim" hidden></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="app.js" defer></script>
+</body>
+</html>
