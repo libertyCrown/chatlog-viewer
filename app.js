@@ -60,6 +60,12 @@ const I18N = {
     emptyFormats: 'ChatGPT Markdown / plain Markdown',
     openSource: 'Open source',
     showLogInfo: 'Show log info',
+    resetDocument: 'Reset loaded Markdown',
+    resetConfirmTitle: 'Reset the loaded Markdown?',
+    resetConfirmBody: 'The current log will close and the start screen will be shown. The original file will not be deleted.',
+    resetDocumentConfirm: 'Reset',
+    resetComplete: 'Loaded Markdown reset',
+    cancel: 'Cancel',
     noMatches: 'No matches',
     menu: 'Menu',
     closeMenu: 'Close menu',
@@ -135,6 +141,12 @@ const I18N = {
     emptyFormats: 'ChatGPT Markdown / 通常Markdown',
     openSource: '元リンクを開く',
     showLogInfo: 'ログ情報を表示',
+    resetDocument: '読み込みをリセット',
+    resetConfirmTitle: '読み込み中のMarkdownをリセットしますか？',
+    resetConfirmBody: '表示中のログを閉じて、最初の画面に戻ります。元のファイルは削除されません。',
+    resetDocumentConfirm: 'リセット',
+    resetComplete: '読み込みをリセットしました',
+    cancel: 'キャンセル',
     noMatches: '一致なし',
     menu: 'メニュー',
     closeMenu: 'メニューを閉じる',
@@ -179,6 +191,7 @@ const els = {
   sidebarScrim: document.getElementById('sidebarScrim'),
   railSearchBtn: document.getElementById('railSearchBtn'),
   openFileBtn: document.getElementById('openFileBtn'),
+  topResetDocumentBtn: document.getElementById('topResetDocumentBtn'),
   installBtn: document.getElementById('installBtn'),
   drawerInstallBtn: document.getElementById('drawerInstallBtn'),
   fileInput: document.getElementById('fileInput'),
@@ -203,6 +216,9 @@ const els = {
   sourceLabel: document.getElementById('sourceLabel'),
   docTitle: document.getElementById('docTitle'),
   sourceLink: document.getElementById('sourceLink'),
+  resetDocumentDialog: document.getElementById('resetDocumentDialog'),
+  cancelResetDocumentBtn: document.getElementById('cancelResetDocumentBtn'),
+  confirmResetDocumentBtn: document.getElementById('confirmResetDocumentBtn'),
   metaDetails: document.getElementById('metaDetails'),
   metaGrid: document.getElementById('metaGrid'),
   conversation: document.getElementById('conversation'),
@@ -362,6 +378,7 @@ function bindEvents() {
   });
 
   els.openFileBtn.addEventListener('click', openFile);
+  els.topResetDocumentBtn.addEventListener('click', requestResetDocument);
   els.emptyOpenFileBtn.addEventListener('click', openFile);
   els.fileInput.addEventListener('change', () => {
     const [file] = els.fileInput.files || [];
@@ -458,6 +475,17 @@ function bindEvents() {
     if (!button || !state.doc) return;
     const message = state.doc.messages.find((item) => item.id === button.dataset.copyId);
     if (message) copyText(message.raw);
+  });
+
+  els.cancelResetDocumentBtn.addEventListener('click', () => {
+    els.resetDocumentDialog.close();
+  });
+  els.confirmResetDocumentBtn.addEventListener('click', () => {
+    els.resetDocumentDialog.close();
+    resetLoadedDocument();
+  });
+  els.resetDocumentDialog.addEventListener('click', (event) => {
+    if (event.target === els.resetDocumentDialog) els.resetDocumentDialog.close();
   });
 
   window.addEventListener('beforeinstallprompt', (event) => {
@@ -771,6 +799,7 @@ function render() {
     activeObserver?.disconnect();
     els.emptyState.hidden = false;
     els.documentView.hidden = true;
+    els.topResetDocumentBtn.hidden = true;
     state.filteredIds = [];
     renderStats(null);
     renderResultStatus([]);
@@ -782,6 +811,7 @@ function render() {
   state.filteredIds = filtered.map((message) => message.id);
   els.emptyState.hidden = true;
   els.documentView.hidden = false;
+  els.topResetDocumentBtn.hidden = false;
   els.docTitle.textContent = state.doc.title;
   els.sourceLabel.textContent = `${state.doc.sourceName} / ${state.doc.encoding}`;
   renderSourceLink();
@@ -939,6 +969,32 @@ function clearSearch(options = {}) {
   }
   render();
   els.searchInput.focus();
+}
+
+function requestResetDocument() {
+  if (!state.doc) return;
+  if (typeof els.resetDocumentDialog.showModal === 'function') {
+    els.resetDocumentDialog.showModal();
+    els.cancelResetDocumentBtn.focus();
+    return;
+  }
+  if (window.confirm(t('resetConfirmTitle'))) resetLoadedDocument();
+}
+
+function resetLoadedDocument() {
+  activeObserver?.disconnect();
+  state.doc = null;
+  state.query = '';
+  state.role = 'all';
+  state.filteredIds = [];
+  state.searchIndex = -1;
+  state.activeId = null;
+  els.searchInput.value = '';
+  els.metaDetails.open = false;
+  updateRoleFilter(null);
+  render();
+  setStatus(t('resetComplete'));
+  showToast(t('resetComplete'));
 }
 
 function jumpSearchResult(direction) {
