@@ -21,7 +21,9 @@
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.9 6.1h14.2a.9.9 0 1 1 0 1.8H4.9a.9.9 0 1 1 0-1.8Zm0 5h14.2a.9.9 0 1 1 0 1.8H4.9a.9.9 0 1 1 0-1.8Zm0 5h14.2a.9.9 0 1 1 0 1.8H4.9a.9.9 0 1 1 0-1.8Z"/></svg>
       </button>
       <div class="brand" aria-label="ChatLog Viewer">
-        <img src="assets/icon.svg" width="32" height="32" alt="">
+        <button class="brand-icon-button" id="aboutAppBtn" type="button" data-i18n-attr="aria-label:aboutApp;title:aboutApp">
+          <img src="assets/icon.svg" width="32" height="32" alt="">
+        </button>
         <div>
           <div class="brand-title">ChatLog Viewer</div>
           <div class="brand-subtitle" data-i18n="brandSubtitle">Local Markdown reader</div>
@@ -248,6 +250,26 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <dialog class="about-dialog" id="aboutDialog" aria-labelledby="aboutDialogTitle" aria-describedby="aboutDialogBody">
+    <div class="about-card" role="document">
+      <div class="about-head">
+        <img src="assets/icon.svg" width="48" height="48" alt="">
+        <h2 id="aboutDialogTitle">ChatLog Viewer</h2>
+        <button class="icon-button about-close" id="closeAboutDialogBtn" type="button" data-i18n-attr="aria-label:close;title:close">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.2 4.9a.9.9 0 0 0-1.3 1.3L10.7 12l-5.8 5.8a.9.9 0 1 0 1.3 1.3l5.8-5.8 5.8 5.8a.9.9 0 0 0 1.3-1.3L13.3 12l5.8-5.8a.9.9 0 1 0-1.3-1.3L12 10.7 6.2 4.9Z"/></svg>
+        </button>
+      </div>
+      <p id="aboutDialogBody" class="about-copy">
+        <span class="about-copy-line" data-i18n="aboutLine1">A lightweight local viewer for</span>
+        <span class="about-copy-line" data-i18n="aboutLine2">reviewing chat logs saved</span>
+        <span class="about-copy-line" data-i18n="aboutLine3">as Markdown.</span>
+      </p>
+      <a class="button button-secondary about-link" href="https://github.com/libertyCrown/chatlog-viewer" target="_blank" rel="noopener noreferrer">
+        <svg class="github-mark" aria-hidden="true" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span data-i18n="viewOnGitHub">View on GitHub</span>
+      </a>
+    </div>
+  </dialog>
   <dialog class="confirm-dialog" id="resetDocumentDialog" aria-labelledby="resetDocumentDialogTitle" aria-describedby="resetDocumentDialogBody">
     <div class="confirm-card" role="document">
       <div class="confirm-head">

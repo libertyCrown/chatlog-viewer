@@ -16,6 +16,11 @@ const LOCALES = {
 const I18N = {
   en: {
     brandSubtitle: 'Local Markdown reader',
+    aboutApp: 'About ChatLog Viewer',
+    aboutLine1: 'A lightweight local viewer for',
+    aboutLine2: 'reviewing chat logs saved',
+    aboutLine3: 'as Markdown.',
+    viewOnGitHub: 'View on GitHub',
     openFile: 'Open Markdown',
     install: 'Install',
     language: 'Language',
@@ -66,6 +71,7 @@ const I18N = {
     resetDocumentConfirm: 'Reset',
     resetComplete: 'Loaded Markdown reset',
     cancel: 'Cancel',
+    close: 'Close',
     noMatches: 'No matches',
     menu: 'Menu',
     closeMenu: 'Close menu',
@@ -97,6 +103,11 @@ const I18N = {
   },
   ja: {
     brandSubtitle: 'ローカルMarkdownリーダー',
+    aboutApp: 'このアプリについて',
+    aboutLine1: 'Markdown形式で保存された',
+    aboutLine2: 'チャットログを読み返すための',
+    aboutLine3: '軽量なローカルビューアです。',
+    viewOnGitHub: 'GitHubで見る',
     openFile: 'Markdownを開く',
     install: 'インストール',
     language: '言語',
@@ -147,6 +158,7 @@ const I18N = {
     resetDocumentConfirm: 'リセット',
     resetComplete: '読み込みをリセットしました',
     cancel: 'キャンセル',
+    close: '閉じる',
     noMatches: '一致なし',
     menu: 'メニュー',
     closeMenu: 'メニューを閉じる',
@@ -181,6 +193,9 @@ const I18N = {
 const els = {
   html: document.documentElement,
   body: document.body,
+  aboutAppBtn: document.getElementById('aboutAppBtn'),
+  aboutDialog: document.getElementById('aboutDialog'),
+  closeAboutDialogBtn: document.getElementById('closeAboutDialogBtn'),
   sidebarRail: document.getElementById('sidebarRail'),
   sidebar: document.getElementById('sidebar'),
   sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
@@ -343,6 +358,14 @@ function init() {
 }
 
 function bindEvents() {
+  els.aboutAppBtn.addEventListener('click', showAboutDialog);
+  els.closeAboutDialogBtn.addEventListener('click', () => {
+    els.aboutDialog.close();
+  });
+  els.aboutDialog.addEventListener('click', (event) => {
+    if (event.target === els.aboutDialog) els.aboutDialog.close();
+  });
+
   els.sidebarToggleBtn.addEventListener('click', () => setDrawerOpen(!state.drawerOpen));
   els.sidebarCloseBtn.addEventListener('click', () => setDrawerOpen(false));
   els.sidebarScrim.addEventListener('click', () => setDrawerOpen(false));
@@ -504,6 +527,12 @@ function bindEvents() {
     els.drawerInstallBtn.hidden = true;
     showToast(t('installed'));
   });
+}
+
+function showAboutDialog() {
+  if (typeof els.aboutDialog.showModal === 'function') {
+    els.aboutDialog.showModal();
+  }
 }
 
 async function promptInstall() {

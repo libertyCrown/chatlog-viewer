@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'chatlog-viewer-v3';
+const CACHE_NAME = 'chatlog-viewer-v5';
 const APP_SHELL = [
   './',
   './index.html',
