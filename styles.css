@@ -237,13 +237,23 @@ svg {
 }
 
 .sidebar {
+  position: relative;
   border-right: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface) 72%, var(--bg));
-  padding: 16px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 0;
+  overflow: hidden;
   height: 100%;
   min-height: 0;
+}
+
+.sidebar-content {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 16px 16px;
+  position: relative;
 }
 
 .sidebar-desktop-header,
@@ -257,6 +267,12 @@ svg {
 
 .sidebar-desktop-header {
   display: flex;
+  z-index: 2;
+  margin-bottom: 0;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 90%, var(--bg));
+  backdrop-filter: blur(14px);
 }
 
 .reader {
@@ -668,12 +684,21 @@ a:focus-visible {
 }
 
 .message-nav {
-  display: grid;
-  gap: 8px;
+  --nav-item-height: 88px;
+  --nav-item-gap: 8px;
+  display: block;
+  contain: layout style;
+}
+
+.nav-spacer {
+  min-height: 0;
+  pointer-events: none;
 }
 
 .nav-item {
   width: 100%;
+  height: var(--nav-item-height);
+  min-height: var(--nav-item-height);
   display: grid;
   gap: 5px;
   text-align: left;
@@ -682,6 +707,9 @@ a:focus-visible {
   border-radius: var(--radius);
   padding: 10px;
   color: inherit;
+  overflow: hidden;
+  margin-bottom: var(--nav-item-gap);
+  contain: layout paint style;
 }
 
 .nav-item:hover,
@@ -1496,6 +1524,10 @@ body.sidebar-collapsed .sidebar-rail {
     transition: transform .2s ease, visibility 0s linear .2s;
   }
 
+  .sidebar-content {
+    padding: 0 16px 16px;
+  }
+
   .sidebar * {
     box-sizing: border-box;
     max-width: 100%;
@@ -1513,16 +1545,6 @@ body.sidebar-collapsed .sidebar-rail {
     transform: translateX(0);
     visibility: visible;
     transition: transform .2s ease, visibility 0s;
-  }
-
-  .sidebar > .panel,
-  .sidebar > .message-nav {
-    margin-left: 16px;
-    margin-right: 16px;
-  }
-
-  .sidebar > .message-nav {
-    margin-bottom: 16px;
   }
 
   .sidebar-scrim {

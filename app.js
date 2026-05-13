@@ -198,6 +198,7 @@ const els = {
   closeAboutDialogBtn: document.getElementById('closeAboutDialogBtn'),
   sidebarRail: document.getElementById('sidebarRail'),
   sidebar: document.getElementById('sidebar'),
+  sidebarContent: document.getElementById('sidebarContent'),
   sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
   sidebarExpandBtn: document.getElementById('sidebarExpandBtn'),
   sidebarCollapseBtn: document.getElementById('sidebarCollapseBtn'),
@@ -264,6 +265,18 @@ const state = {
 
 let searchTimer = null;
 let activeObserver = null;
+const NAV_ITEM_HEIGHT = 88;
+const NAV_ITEM_GAP = 8;
+const NAV_ROW_HEIGHT = NAV_ITEM_HEIGHT + NAV_ITEM_GAP;
+const NAV_OVERSCAN = 8;
+const NAV_VIRTUAL_THRESHOLD = 120;
+const navState = {
+  messages: [],
+  virtual: false,
+  start: -1,
+  end: -1,
+  frame: null
+};
 
 function initialLanguage() {
   const stored = localStorage.getItem(STORAGE.language);
@@ -398,7 +411,9 @@ function bindEvents() {
   window.addEventListener('resize', () => {
     if (!isDrawerMode()) setDrawerOpen(false);
     setSidebarCollapsed(state.sidebarCollapsed);
+    scheduleRenderMessageNavWindow();
   });
+  els.sidebarContent.addEventListener('scroll', scheduleRenderMessageNavWindow, { passive: true });
 
   els.openFileBtn.addEventListener('click', openFile);
   els.topResetDocumentBtn.addEventListener('click', requestResetDocument);
@@ -560,6 +575,7 @@ function setDrawerOpen(open) {
 
   if (open) {
     els.sidebarCloseBtn.focus({ preventScroll: true });
+    scheduleRenderMessageNavWindow();
   } else if (document.activeElement && els.sidebar.contains(document.activeElement)) {
     els.sidebarToggleBtn.focus({ preventScroll: true });
   }
@@ -584,6 +600,7 @@ function setSidebarCollapsed(collapsed) {
       els.sidebar.inert = !state.drawerOpen;
     }
   }
+  scheduleRenderMessageNavWindow();
 }
 
 function isDrawerMode() {
@@ -734,12 +751,15 @@ function parseChatMarkdown(text, sourceName, encoding) {
         turn: turn || 1,
         raw,
         plain,
+        searchText: normalizeForSearch(plain),
+        navExcerpt: plain.slice(0, 180),
         chars: Array.from(plain).length
       });
     });
   } else {
     const body = normalized.replace(/^#\s+.+$/m, '').trim();
     if (body) {
+      const plain = stripMarkdown(body);
       messages.push({
         id: 'message-1',
         role: 'response',
@@ -748,8 +768,10 @@ function parseChatMarkdown(text, sourceName, encoding) {
         isPrimarySpeaker: true,
         turn: 1,
         raw: body,
-        plain: stripMarkdown(body),
-        chars: Array.from(stripMarkdown(body)).length
+        plain,
+        searchText: normalizeForSearch(plain),
+        navExcerpt: plain.slice(0, 180),
+        chars: Array.from(plain).length
       });
     }
   }
@@ -832,7 +854,7 @@ function render() {
     state.filteredIds = [];
     renderStats(null);
     renderResultStatus([]);
-    els.messageList.innerHTML = '';
+    resetMessageNav();
     return;
   }
 
@@ -897,7 +919,7 @@ function filteredMessages() {
   const query = normalizeForSearch(state.query);
   return state.doc.messages.filter((message) => {
     const roleMatches = state.role === 'all' || message.role === state.role;
-    const queryMatches = !query || normalizeForSearch(message.plain).includes(query);
+    const queryMatches = !query || (message.searchText || normalizeForSearch(message.plain)).includes(query);
     return roleMatches && queryMatches;
   });
 }
@@ -930,15 +952,113 @@ function renderConversation(messages) {
 }
 
 function renderMessageNav(messages) {
-  els.messageList.innerHTML = messages.map((message) => `
-    <button class="nav-item ${message.id === state.activeId ? 'is-active' : ''}" type="button" data-message-id="${message.id}">
-      <span class="nav-row">
-        <span class="role-chip ${message.role} speaker-${message.participantIndex % 20}">${escapeHtml(participantLabel(message))}</span>
-        <span class="turn-label">${escapeHtml(t('turn', { n: message.turn }))}</span>
-      </span>
-      <span class="nav-excerpt">${escapeHtml(message.plain || message.raw).slice(0, 180)}</span>
-    </button>
-  `).join('');
+  navState.messages = messages;
+  navState.virtual = messages.length > NAV_VIRTUAL_THRESHOLD;
+  navState.start = -1;
+  navState.end = -1;
+  els.messageList.classList.toggle('is-virtualized', navState.virtual);
+
+  if (!messages.length) {
+    els.messageList.replaceChildren();
+    return;
+  }
+
+  if (!navState.virtual) {
+    const fragment = document.createDocumentFragment();
+    messages.forEach((message) => fragment.append(createMessageNavItem(message)));
+    els.messageList.replaceChildren(fragment);
+    updateActiveNavItem();
+    return;
+  }
+
+  renderMessageNavWindow();
+}
+
+function resetMessageNav() {
+  navState.messages = [];
+  navState.virtual = false;
+  navState.start = -1;
+  navState.end = -1;
+  if (navState.frame) {
+    cancelAnimationFrame(navState.frame);
+    navState.frame = null;
+  }
+  els.messageList.classList.remove('is-virtualized');
+  els.messageList.replaceChildren();
+}
+
+function createMessageNavItem(message) {
+  const button = document.createElement('button');
+  const speakerClass = `speaker-${message.participantIndex % 20}`;
+  button.className = `nav-item ${message.role} ${message.id === state.activeId ? 'is-active' : ''}`;
+  button.type = 'button';
+  button.dataset.messageId = message.id;
+
+  const row = document.createElement('span');
+  row.className = 'nav-row';
+
+  const chip = document.createElement('span');
+  chip.className = `role-chip ${message.role} ${speakerClass}`;
+  chip.textContent = participantLabel(message);
+
+  const turn = document.createElement('span');
+  turn.className = 'turn-label';
+  turn.textContent = t('turn', { n: message.turn });
+
+  const excerpt = document.createElement('span');
+  excerpt.className = 'nav-excerpt';
+  excerpt.textContent = message.navExcerpt || message.plain || message.raw;
+
+  row.append(chip, turn);
+  button.append(row, excerpt);
+  return button;
+}
+
+function scheduleRenderMessageNavWindow() {
+  if (!navState.virtual || navState.frame) return;
+  navState.frame = requestAnimationFrame(() => {
+    navState.frame = null;
+    renderMessageNavWindow();
+  });
+}
+
+function renderMessageNavWindow() {
+  if (!navState.virtual) return;
+  const messages = navState.messages;
+  if (!messages.length) {
+    els.messageList.replaceChildren();
+    return;
+  }
+
+  const viewport = Math.max(els.sidebarContent.clientHeight, 360);
+  const listTop = els.messageList.offsetTop;
+  const scrollTop = Math.max(0, els.sidebarContent.scrollTop - listTop);
+  const start = Math.max(0, Math.floor(scrollTop / NAV_ROW_HEIGHT) - NAV_OVERSCAN);
+  const visibleCount = Math.ceil(viewport / NAV_ROW_HEIGHT) + NAV_OVERSCAN * 2;
+  const end = Math.min(messages.length, start + visibleCount);
+
+  if (start === navState.start && end === navState.end) {
+    updateActiveNavItem();
+    return;
+  }
+
+  navState.start = start;
+  navState.end = end;
+
+  const topSpacer = document.createElement('div');
+  topSpacer.className = 'nav-spacer';
+  topSpacer.style.height = `${start * NAV_ROW_HEIGHT}px`;
+
+  const bottomSpacer = document.createElement('div');
+  bottomSpacer.className = 'nav-spacer';
+  bottomSpacer.style.height = `${Math.max(0, (messages.length - end) * NAV_ROW_HEIGHT)}px`;
+
+  const fragment = document.createDocumentFragment();
+  fragment.append(topSpacer);
+  messages.slice(start, end).forEach((message) => fragment.append(createMessageNavItem(message)));
+  fragment.append(bottomSpacer);
+  els.messageList.replaceChildren(fragment);
+  updateActiveNavItem();
 }
 
 function participantLabel(message) {
@@ -964,8 +1084,12 @@ function observeVisibleMessages() {
 function setActiveMessage(id) {
   if (!id || state.activeId === id) return;
   state.activeId = id;
+  updateActiveNavItem();
+}
+
+function updateActiveNavItem() {
   els.messageList.querySelectorAll('.nav-item').forEach((item) => {
-    item.classList.toggle('is-active', item.dataset.messageId === id);
+    item.classList.toggle('is-active', item.dataset.messageId === state.activeId);
   });
 }
 
@@ -1033,7 +1157,23 @@ function jumpSearchResult(direction) {
   const id = state.filteredIds[state.searchIndex];
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   setActiveMessage(id);
+  scrollMessageNavToId(id);
   setDrawerOpen(false);
+}
+
+function scrollMessageNavToId(id) {
+  const index = navState.messages.findIndex((message) => message.id === id);
+  if (index < 0) return;
+
+  if (navState.virtual) {
+    els.sidebarContent.scrollTop = Math.max(0, els.messageList.offsetTop + index * NAV_ROW_HEIGHT - NAV_ITEM_GAP);
+    renderMessageNavWindow();
+    return;
+  }
+
+  [...els.messageList.querySelectorAll('.nav-item')]
+    .find((item) => item.dataset.messageId === id)
+    ?.scrollIntoView({ block: 'nearest' });
 }
 
 function markdownToHtml(markdown, highlightTerm = '') {
