@@ -84,6 +84,8 @@ const I18N = {
     menu: 'Menu',
     closeMenu: 'Close menu',
     sidebarTitle: 'Library',
+    messageList: 'Messages',
+    conversation: 'Conversation',
     source: 'Source',
     user: 'User',
     created: 'Created',
@@ -94,6 +96,7 @@ const I18N = {
     turn: 'Turn {n}',
     copied: 'Copied',
     copy: 'Copy',
+    copyMessage: 'Copy {speaker}, {turn}',
     loadedFile: 'Loaded: {name}',
     loadedUrl: 'Loaded URL',
     decodeUsed: 'Encoding: {encoding}',
@@ -179,6 +182,8 @@ const I18N = {
     menu: 'メニュー',
     closeMenu: 'メニューを閉じる',
     sidebarTitle: 'ライブラリ',
+    messageList: '発言一覧',
+    conversation: '会話本文',
     source: '読込元',
     user: 'ユーザー',
     created: '作成',
@@ -189,6 +194,7 @@ const I18N = {
     turn: '{n}往復目',
     copied: 'コピーしました',
     copy: 'コピー',
+    copyMessage: '{speaker}の{turn}をコピー',
     loadedFile: '読み込み完了: {name}',
     loadedUrl: 'URLを読み込みました',
     decodeUsed: '文字コード: {encoding}',
@@ -217,10 +223,12 @@ const {
 const { safeUrl: safeUrlForBase } = globalThis.ChatLogUrl;
 const APP_VERSION = globalThis.ChatLogViewerVersion;
 const { shouldOfferUpdate, shouldReloadAfterUpdate } = globalThis.ChatLogPwaUpdate;
+const { nextMessageNavIndex } = globalThis.ChatLogNavigation;
 
 const els = {
   html: document.documentElement,
   body: document.body,
+  topbar: document.getElementById('topbar'),
   aboutAppBtn: document.getElementById('aboutAppBtn'),
   aboutDialog: document.getElementById('aboutDialog'),
   aboutVersion: document.getElementById('aboutVersion'),
@@ -324,6 +332,9 @@ const navState = {
   frame: null
 };
 
+const dialogReturnFocus = new Map();
+const DRAWER_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 function initialLanguage() {
   const stored = localStorage.getItem(STORAGE.language);
   if (stored && LOCALES[stored] && I18N[stored]) return stored;
@@ -383,7 +394,9 @@ function populateLanguageOptions() {
 function applyTheme() {
   els.html.dataset.theme = state.theme;
   document.querySelectorAll('[data-theme-choice]').forEach((button) => {
-    button.classList.toggle('is-active', button.dataset.themeChoice === state.theme);
+    const selected = button.dataset.themeChoice === state.theme;
+    button.classList.toggle('is-active', selected);
+    button.setAttribute('aria-pressed', String(selected));
   });
 }
 
@@ -422,10 +435,10 @@ function init() {
 function bindEvents() {
   els.aboutAppBtn.addEventListener('click', showAboutDialog);
   els.closeAboutDialogBtn.addEventListener('click', () => {
-    els.aboutDialog.close();
+    closeDialog(els.aboutDialog);
   });
   els.aboutDialog.addEventListener('click', (event) => {
-    if (event.target === els.aboutDialog) els.aboutDialog.close();
+    if (event.target === els.aboutDialog) closeDialog(els.aboutDialog);
   });
 
   els.sidebarToggleBtn.addEventListener('click', () => setDrawerOpen(!state.drawerOpen));
@@ -439,6 +452,7 @@ function bindEvents() {
     requestAnimationFrame(() => els.searchInput.focus());
   });
   window.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab' && state.drawerOpen && trapDrawerFocus(event)) return;
     if (event.key === 'Escape' && state.drawerOpen) setDrawerOpen(false);
     if (event.key === 'Enter' && document.activeElement === els.searchInput) {
       event.preventDefault();
@@ -556,9 +570,11 @@ function bindEvents() {
     const button = event.target.closest('[data-message-id]');
     if (!button) return;
     const target = document.getElementById(button.dataset.messageId);
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (target) target.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+    setActiveMessage(button.dataset.messageId);
     setDrawerOpen(false);
   });
+  els.messageList.addEventListener('keydown', handleMessageListKeydown);
 
   els.conversation.addEventListener('click', (event) => {
     const button = event.target.closest('[data-copy-id]');
@@ -568,14 +584,17 @@ function bindEvents() {
   });
 
   els.cancelResetDocumentBtn.addEventListener('click', () => {
-    els.resetDocumentDialog.close();
+    closeDialog(els.resetDocumentDialog);
   });
   els.confirmResetDocumentBtn.addEventListener('click', () => {
-    els.resetDocumentDialog.close();
     resetLoadedDocument();
+    closeDialog(els.resetDocumentDialog, els.emptyOpenFileBtn);
   });
   els.resetDocumentDialog.addEventListener('click', (event) => {
-    if (event.target === els.resetDocumentDialog) els.resetDocumentDialog.close();
+    if (event.target === els.resetDocumentDialog) closeDialog(els.resetDocumentDialog);
+  });
+  [els.aboutDialog, els.resetDocumentDialog].forEach((dialog) => {
+    dialog.addEventListener('close', () => restoreDialogFocus(dialog));
   });
 
   window.addEventListener('beforeinstallprompt', (event) => {
@@ -599,9 +618,29 @@ function bindEvents() {
 }
 
 function showAboutDialog() {
-  if (typeof els.aboutDialog.showModal === 'function') {
-    els.aboutDialog.showModal();
-  }
+  showDialog(els.aboutDialog, els.aboutAppBtn, els.closeAboutDialogBtn);
+}
+
+function showDialog(dialog, opener, initialFocus) {
+  if (typeof dialog.showModal !== 'function') return false;
+  dialogReturnFocus.set(dialog, opener || document.activeElement);
+  dialog.showModal();
+  requestAnimationFrame(() => {
+    if (dialog.open && initialFocus?.isConnected) initialFocus.focus({ preventScroll: true });
+  });
+  return true;
+}
+
+function closeDialog(dialog, returnFocus) {
+  if (!dialog.open) return;
+  if (returnFocus) dialogReturnFocus.set(dialog, returnFocus);
+  dialog.close();
+}
+
+function restoreDialogFocus(dialog) {
+  const target = dialogReturnFocus.get(dialog);
+  dialogReturnFocus.delete(dialog);
+  if (target?.isConnected && !target.hidden) target.focus({ preventScroll: true });
 }
 
 function showServiceWorkerUpdate(registration) {
@@ -656,6 +695,7 @@ function setDrawerOpen(open) {
   if ('inert' in els.sidebar) {
     els.sidebar.inert = drawerMode && !open;
   }
+  setDrawerBackgroundInert(open && drawerMode);
 
   if (open) {
     els.sidebarCloseBtn.focus({ preventScroll: true });
@@ -663,6 +703,38 @@ function setDrawerOpen(open) {
   } else if (document.activeElement && els.sidebar.contains(document.activeElement)) {
     els.sidebarToggleBtn.focus({ preventScroll: true });
   }
+}
+
+function setDrawerBackgroundInert(inert) {
+  [els.topbar, els.reader].forEach((element) => {
+    element.setAttribute('aria-hidden', String(inert));
+    if ('inert' in element) element.inert = inert;
+  });
+}
+
+function trapDrawerFocus(event) {
+  const focusable = [...els.sidebar.querySelectorAll(DRAWER_FOCUSABLE_SELECTOR)]
+    .filter((element) => !element.hidden && element.getClientRects().length);
+  if (!focusable.length) return false;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const current = document.activeElement;
+  if (event.shiftKey && (current === first || !els.sidebar.contains(current))) {
+    event.preventDefault();
+    last.focus();
+    return true;
+  }
+  if (!event.shiftKey && (current === last || !els.sidebar.contains(current))) {
+    event.preventDefault();
+    first.focus();
+    return true;
+  }
+  return false;
+}
+
+function scrollBehavior() {
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 }
 
 function setSidebarCollapsed(collapsed) {
@@ -956,6 +1028,8 @@ function renderMessageNavIfNeeded(messages) {
 function renderConversation(messages) {
   els.conversation.innerHTML = messages.map((message) => {
     const roleLabel = participantLabel(message);
+    const turnLabel = t('turn', { n: message.turn });
+    const copyLabel = t('copyMessage', { speaker: roleLabel, turn: turnLabel });
     const speakerClass = `speaker-${message.participantIndex % 20}`;
     const primaryClass = message.isPrimarySpeaker ? 'speaker-primary' : 'speaker-secondary';
     return `
@@ -963,11 +1037,11 @@ function renderConversation(messages) {
         <header class="message-head">
           <div class="message-title">
             <span class="role-chip ${message.role} ${speakerClass}">${escapeHtml(roleLabel)}</span>
-            <span class="turn-label">${escapeHtml(t('turn', { n: message.turn }))}</span>
+            <span class="turn-label">${escapeHtml(turnLabel)}</span>
           </div>
           <div class="message-tools">
             <span class="turn-label">${escapeHtml(t('countLabel', { n: formatNumber(message.chars) }))}</span>
-            <button class="mini-button" type="button" data-copy-id="${message.id}" title="${escapeHtml(t('copy'))}" aria-label="${escapeHtml(t('copy'))}">
+            <button class="mini-button" type="button" data-copy-id="${message.id}" title="${escapeHtml(copyLabel)}" aria-label="${escapeHtml(copyLabel)}">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 4.8A2.8 2.8 0 0 1 10.8 2h5.4A2.8 2.8 0 0 1 19 4.8v8.4a2.8 2.8 0 0 1-2.8 2.8h-5.4A2.8 2.8 0 0 1 8 13.2V4.8Zm2.8-1a1 1 0 0 0-1 1v8.4a1 1 0 0 0 1 1h5.4a1 1 0 0 0 1-1V4.8a1 1 0 0 0-1-1h-5.4ZM5 8a.9.9 0 0 1 .9.9v8.3a3 3 0 0 0 3 3h5.2a.9.9 0 1 1 0 1.8H8.9A4.8 4.8 0 0 1 4.1 17.2V8.9A.9.9 0 0 1 5 8Z"/></svg>
             </button>
           </div>
@@ -1047,7 +1121,7 @@ function setCurrentSearchMark(result) {
   const card = document.getElementById(result.messageId);
   const mark = card?.querySelector(`mark[data-search-occurrence="${result.occurrence}"]`);
   if (mark) mark.classList.add('is-current');
-  (mark || card)?.scrollIntoView({ behavior: 'smooth', block: mark ? 'center' : 'start' });
+  (mark || card)?.scrollIntoView({ behavior: scrollBehavior(), block: mark ? 'center' : 'start' });
 }
 
 function renderMessageNav(messages) {
@@ -1092,6 +1166,7 @@ function createMessageNavItem(message) {
   button.className = `nav-item ${message.role} ${message.id === state.activeId ? 'is-active' : ''}`;
   button.type = 'button';
   button.dataset.messageId = message.id;
+  if (message.id === state.activeId) button.setAttribute('aria-current', 'location');
 
   const row = document.createElement('span');
   row.className = 'nav-row';
@@ -1189,7 +1264,35 @@ function setActiveMessage(id) {
 
 function updateActiveNavItem() {
   els.messageList.querySelectorAll('.nav-item').forEach((item) => {
-    item.classList.toggle('is-active', item.dataset.messageId === state.activeId);
+    const active = item.dataset.messageId === state.activeId;
+    item.classList.toggle('is-active', active);
+    if (active) item.setAttribute('aria-current', 'location');
+    else item.removeAttribute('aria-current');
+  });
+}
+
+function handleMessageListKeydown(event) {
+  const button = event.target.closest('.nav-item');
+  if (!button || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  const currentIndex = navState.messages.findIndex((message) => message.id === button.dataset.messageId);
+  const nextIndex = nextMessageNavIndex(currentIndex, navState.messages.length, event.key);
+  if (nextIndex < 0) return;
+  event.preventDefault();
+  if (nextIndex === currentIndex) return;
+  focusMessageNavIndex(nextIndex);
+}
+
+function focusMessageNavIndex(index) {
+  const message = navState.messages[index];
+  if (!message) return;
+
+  if (navState.virtual) {
+    els.sidebarContent.scrollTop = Math.max(0, els.messageList.offsetTop + index * NAV_ROW_HEIGHT - NAV_ITEM_GAP);
+    renderMessageNavWindow();
+  }
+
+  requestAnimationFrame(() => {
+    els.messageList.querySelector(`[data-message-id="${message.id}"]`)?.focus({ preventScroll: true });
   });
 }
 
@@ -1227,11 +1330,7 @@ function clearSearch(options = {}) {
 
 function requestResetDocument() {
   if (!state.doc) return;
-  if (typeof els.resetDocumentDialog.showModal === 'function') {
-    els.resetDocumentDialog.showModal();
-    els.cancelResetDocumentBtn.focus();
-    return;
-  }
+  if (showDialog(els.resetDocumentDialog, els.topResetDocumentBtn, els.cancelResetDocumentBtn)) return;
   if (window.confirm(t('resetConfirmTitle'))) resetLoadedDocument();
 }
 

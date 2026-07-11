@@ -175,12 +175,12 @@ svg {
   background: transparent;
 }
 
-.brand-icon-button:active,
-.brand-icon-button:focus,
-.brand-icon-button:focus-visible {
+.brand-icon-button:active {
   background: transparent;
-  box-shadow: none;
-  outline: none;
+}
+
+.brand-icon-button:focus-visible {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .brand img {
@@ -431,6 +431,11 @@ a:focus-visible {
   box-shadow: var(--focus);
 }
 
+summary:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
 .segmented {
   display: inline-flex;
   border: 1px solid var(--line-strong);
@@ -654,6 +659,17 @@ a:focus-visible {
   outline: none;
 }
 
+/* Keep the app's clear button as the single visible clear action. */
+.search-box input[type="search"]::-webkit-search-cancel-button,
+.search-box input[type="search"]::-webkit-search-decoration {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.search-box input[type="search"]::-ms-clear {
+  display: none;
+}
+
 .result-toolbar {
   display: flex;
   align-items: center;
@@ -740,6 +756,11 @@ a:focus-visible {
   background: var(--accent-soft);
 }
 
+.nav-item.is-active .nav-excerpt {
+  color: var(--text);
+  font-weight: 650;
+}
+
 .nav-row {
   display: flex;
   align-items: center;
@@ -796,6 +817,18 @@ a:focus-visible {
   color: var(--speaker);
   background: color-mix(in srgb, var(--speaker) 13%, var(--surface));
   border-color: color-mix(in srgb, var(--speaker) 36%, var(--line));
+}
+
+:root[data-theme="dark"] .role-chip[class*="speaker-"] {
+  color: color-mix(in srgb, var(--speaker) 42%, var(--text));
+  border-color: color-mix(in srgb, var(--speaker) 48%, var(--line-strong));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] .role-chip[class*="speaker-"] {
+    color: color-mix(in srgb, var(--speaker) 42%, var(--text));
+    border-color: color-mix(in srgb, var(--speaker) 48%, var(--line-strong));
+  }
 }
 
 .nav-excerpt {
@@ -1448,6 +1481,17 @@ body.sidebar-collapsed .sidebar-rail {
 
 [hidden] {
   display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
 }
 
 @media (max-width: 860px) {

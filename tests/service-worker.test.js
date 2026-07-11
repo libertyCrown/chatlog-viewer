@@ -75,3 +75,9 @@ test('waits for an explicit message before calling skipWaiting', async () => {
   await updatePromise;
   assert.equal(skipWaitingCalls(), 1);
 });
+
+test('keeps keyboard navigation support in the app-shell cache only', () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+  assert.match(source, /'\.\/lib\/navigation\.js'/);
+  assert.doesNotMatch(source, /\.md'/);
+});

@@ -13,6 +13,7 @@ const APP_SHELL = [
   './lib/url.js',
   './lib/parser.js',
   './lib/pwa-update.js',
+  './lib/navigation.js',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/icon-192.png',
