@@ -23,11 +23,12 @@ const I18N = {
     appVersion: 'Version {version}',
     viewOnGitHub: 'View on GitHub',
     updateAvailableTitle: 'A new version is ready',
-    updateAvailableBody: 'Updating closes the current local Markdown view, but never changes or deletes the original file.',
+    updateAvailableBody: 'Updating closes the current log. The original Markdown file will not be changed or deleted.',
     updateNow: 'Update',
     updateLater: 'Later',
     updateApplying: 'Updating...',
     openFile: 'Open Markdown',
+    chooseFile: 'Choose file',
     install: 'Install',
     language: 'Language',
     theme: 'Theme',
@@ -35,11 +36,9 @@ const I18N = {
     advancedSettings: 'Advanced settings',
     showSidebar: 'Show sidebar',
     hideSidebar: 'Collapse sidebar',
-    dropTitle: 'Drop Markdown',
-    dropOr: 'or',
-    chooseFile: 'choose a file',
+    dropFileHint: 'Drop a Markdown file here',
+    dropFileHere: 'Drop to open a Markdown file',
     encoding: 'Encoding',
-    density: 'Density',
     displayMode: 'Display',
     comfortable: 'Comfortable',
     compact: 'Compact',
@@ -68,22 +67,22 @@ const I18N = {
     tool: 'Tool',
     clear: 'Clear',
     resetFilters: 'Reset filters',
-    emptyTitle: 'Open a Markdown chat log',
-    emptyBody: 'Files stay in this browser.',
+    emptyTitle: 'Open a chat log',
+    emptyBody: 'Local files are processed in this browser.',
     emptyFormats: 'ChatGPT Markdown / plain Markdown',
-    openSource: 'Open source',
+    openSource: 'Open original link',
     showLogInfo: 'Show log info',
-    resetDocument: 'Reset loaded Markdown',
-    resetConfirmTitle: 'Reset the loaded Markdown?',
-    resetConfirmBody: 'The current log will close and the start screen will be shown. The original file will not be deleted.',
-    resetDocumentConfirm: 'Reset',
-    resetComplete: 'Loaded Markdown reset',
+    closeDocument: 'Close log',
+    closeConfirmTitle: 'Close this log?',
+    closeConfirmBody: 'The current log will close and the start screen will be shown. The original file will not be changed or deleted.',
+    closeDocumentConfirm: 'Close log',
+    closeComplete: 'Log closed',
     cancel: 'Cancel',
     close: 'Close',
     noMatches: 'No matches',
     menu: 'Menu',
     closeMenu: 'Close menu',
-    sidebarTitle: 'Library',
+    sidebarTitle: 'Navigation',
     messageList: 'Messages',
     conversation: 'Conversation',
     source: 'Source',
@@ -104,7 +103,7 @@ const I18N = {
     fetchFailed: 'Could not load that URL. Check CORS or serve the file over HTTP/HTTPS.',
     fileFailed: 'Could not open that file',
     noFile: 'No file selected',
-    unsupportedUrl: 'Use http, https, or a relative URL served over HTTP/HTTPS',
+    unsupportedUrl: 'Use an HTTP/HTTPS URL or a relative URL from this site',
     installReady: 'Install is available',
     installed: 'Installed',
     themeSystem: 'System',
@@ -121,11 +120,12 @@ const I18N = {
     appVersion: 'バージョン {version}',
     viewOnGitHub: 'GitHubで見る',
     updateAvailableTitle: '新しいバージョンがあります',
-    updateAvailableBody: '更新すると、現在表示中のローカルMarkdownは閉じます。元のファイル自体は変更・削除されません。',
+    updateAvailableBody: '更新すると、現在表示中のログは閉じます。元のMarkdownファイルは変更・削除されません。',
     updateNow: '更新する',
     updateLater: '後で',
     updateApplying: '更新しています…',
     openFile: 'Markdownを開く',
+    chooseFile: 'ファイルを選択',
     install: 'インストール',
     language: '言語',
     theme: 'テーマ',
@@ -133,11 +133,9 @@ const I18N = {
     advancedSettings: '詳細設定',
     showSidebar: 'サイドバーを表示',
     hideSidebar: 'サイドバーを畳む',
-    dropTitle: 'Markdownをドロップ',
-    dropOr: 'または',
-    chooseFile: 'ファイル選択',
+    dropFileHint: 'Markdownファイルをここにドロップ',
+    dropFileHere: 'Markdownファイルをドロップして開く',
     encoding: '文字コード',
-    density: '表示方法',
     displayMode: '表示方法',
     comfortable: '標準',
     compact: 'コンパクト',
@@ -166,22 +164,22 @@ const I18N = {
     tool: 'Tool',
     clear: 'クリア',
     resetFilters: '検索条件をリセット',
-    emptyTitle: 'Markdown\u200Bチャットログを開く',
+    emptyTitle: 'チャットログを開く',
     emptyBody: 'ファイルはこのブラウザ内で\u200B処理されます。',
     emptyFormats: 'ChatGPT Markdown / 通常Markdown',
     openSource: '元リンクを開く',
     showLogInfo: 'ログ情報を表示',
-    resetDocument: '読み込みをリセット',
-    resetConfirmTitle: '読み込み中のMarkdownをリセットしますか？',
-    resetConfirmBody: '表示中のログを閉じて、最初の画面に戻ります。元のファイルは削除されません。',
-    resetDocumentConfirm: 'リセット',
-    resetComplete: '読み込みをリセットしました',
+    closeDocument: 'ログを閉じる',
+    closeConfirmTitle: 'このログを閉じますか？',
+    closeConfirmBody: '表示中のログを閉じて、最初の画面に戻ります。元のファイルは変更・削除されません。',
+    closeDocumentConfirm: 'ログを閉じる',
+    closeComplete: 'ログを閉じました',
     cancel: 'キャンセル',
     close: '閉じる',
     noMatches: '一致なし',
     menu: 'メニュー',
     closeMenu: 'メニューを閉じる',
-    sidebarTitle: 'ライブラリ',
+    sidebarTitle: 'ナビゲーション',
     messageList: '発言一覧',
     conversation: '会話本文',
     source: '読込元',
@@ -199,10 +197,10 @@ const I18N = {
     loadedUrl: 'URLを読み込みました',
     decodeUsed: '文字コード: {encoding}',
     parseFallback: '通常のMarkdownとして読み込みました',
-    fetchFailed: 'URLを読み込めませんでした。CORS制限、またはHTTP/HTTPS配信かを確認してください',
+    fetchFailed: 'URLを読み込めませんでした。CORS制限、またはHTTP/HTTPS配信かを確認してください。',
     fileFailed: 'ファイルを開けませんでした',
     noFile: 'ファイルが選択されていません',
-    unsupportedUrl: 'http、https、またはHTTP/HTTPS上の相対URLを指定してください',
+    unsupportedUrl: 'HTTP/HTTPSのURL、または同じサイト内の相対URLを指定してください。',
     installReady: 'インストールできます',
     installed: 'インストール済み',
     themeSystem: 'システム',
@@ -244,11 +242,12 @@ const els = {
   sidebarScrim: document.getElementById('sidebarScrim'),
   railSearchBtn: document.getElementById('railSearchBtn'),
   openFileBtn: document.getElementById('openFileBtn'),
-  topResetDocumentBtn: document.getElementById('topResetDocumentBtn'),
+  topCloseDocumentBtn: document.getElementById('topCloseDocumentBtn'),
   installBtn: document.getElementById('installBtn'),
   drawerInstallBtn: document.getElementById('drawerInstallBtn'),
   fileInput: document.getElementById('fileInput'),
   emptyDropZone: document.getElementById('emptyDropZone'),
+  dropOverlay: document.getElementById('dropOverlay'),
   emptyOpenFileBtn: document.getElementById('emptyOpenFileBtn'),
   encodingSelect: document.getElementById('encodingSelect'),
   densitySelect: document.getElementById('densitySelect'),
@@ -270,9 +269,9 @@ const els = {
   sourceLabel: document.getElementById('sourceLabel'),
   docTitle: document.getElementById('docTitle'),
   sourceLink: document.getElementById('sourceLink'),
-  resetDocumentDialog: document.getElementById('resetDocumentDialog'),
-  cancelResetDocumentBtn: document.getElementById('cancelResetDocumentBtn'),
-  confirmResetDocumentBtn: document.getElementById('confirmResetDocumentBtn'),
+  closeDocumentDialog: document.getElementById('closeDocumentDialog'),
+  cancelCloseDocumentBtn: document.getElementById('cancelCloseDocumentBtn'),
+  confirmCloseDocumentBtn: document.getElementById('confirmCloseDocumentBtn'),
   metaDetails: document.getElementById('metaDetails'),
   metaGrid: document.getElementById('metaGrid'),
   conversation: document.getElementById('conversation'),
@@ -319,6 +318,7 @@ const state = {
 
 let searchTimer = null;
 let activeObserver = null;
+let fileDragDepth = 0;
 const NAV_ITEM_HEIGHT = 88;
 const NAV_ITEM_GAP = 8;
 const NAV_ROW_HEIGHT = NAV_ITEM_HEIGHT + NAV_ITEM_GAP;
@@ -478,7 +478,7 @@ function bindEvents() {
   els.sidebarContent.addEventListener('scroll', scheduleRenderMessageNavWindow, { passive: true });
 
   els.openFileBtn.addEventListener('click', openFile);
-  els.topResetDocumentBtn.addEventListener('click', requestResetDocument);
+  els.topCloseDocumentBtn.addEventListener('click', requestCloseDocument);
   els.emptyOpenFileBtn.addEventListener('click', openFile);
   els.fileInput.addEventListener('change', () => {
     const [file] = els.fileInput.files || [];
@@ -486,27 +486,15 @@ function bindEvents() {
     else setStatus(t('noFile'));
     els.fileInput.value = '';
   });
-
-  [els.emptyDropZone].forEach((zone) => {
-    ['dragenter', 'dragover'].forEach((eventName) => {
-      zone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        zone.classList.add('is-dragging');
-      });
-    });
-
-    ['dragleave', 'drop'].forEach((eventName) => {
-      zone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        zone.classList.remove('is-dragging');
-      });
-    });
-
-    zone.addEventListener('drop', (event) => {
-      const [file] = event.dataTransfer.files || [];
-      if (file) loadFile(file);
-    });
-  });
+  window.addEventListener('dragenter', handleFileDragEnter);
+  window.addEventListener('dragover', handleFileDragOver);
+  window.addEventListener('dragleave', handleFileDragLeave);
+  window.addEventListener('drop', handleFileDrop);
+  window.addEventListener('dragend', resetFileDragState);
+  els.emptyDropZone.addEventListener('dragenter', handleFileDragEnter);
+  els.emptyDropZone.addEventListener('dragover', handleFileDragOver);
+  els.emptyDropZone.addEventListener('dragleave', handleFileDragLeave);
+  els.emptyDropZone.addEventListener('drop', handleFileDrop);
 
   els.encodingSelect.addEventListener('change', () => {
     state.encoding = els.encodingSelect.value;
@@ -586,17 +574,17 @@ function bindEvents() {
     if (message) copyText(message.raw);
   });
 
-  els.cancelResetDocumentBtn.addEventListener('click', () => {
-    closeDialog(els.resetDocumentDialog);
+  els.cancelCloseDocumentBtn.addEventListener('click', () => {
+    closeDialog(els.closeDocumentDialog);
   });
-  els.confirmResetDocumentBtn.addEventListener('click', () => {
-    resetLoadedDocument();
-    closeDialog(els.resetDocumentDialog, els.emptyOpenFileBtn);
+  els.confirmCloseDocumentBtn.addEventListener('click', () => {
+    closeLoadedDocument();
+    closeDialog(els.closeDocumentDialog, els.emptyOpenFileBtn);
   });
-  els.resetDocumentDialog.addEventListener('click', (event) => {
-    if (event.target === els.resetDocumentDialog) closeDialog(els.resetDocumentDialog);
+  els.closeDocumentDialog.addEventListener('click', (event) => {
+    if (event.target === els.closeDocumentDialog) closeDialog(els.closeDocumentDialog);
   });
-  [els.aboutDialog, els.resetDocumentDialog].forEach((dialog) => {
+  [els.aboutDialog, els.closeDocumentDialog].forEach((dialog) => {
     dialog.addEventListener('close', () => restoreDialogFocus(dialog));
   });
 
@@ -740,6 +728,65 @@ function scrollBehavior() {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 }
 
+function hasDraggedFiles(event) {
+  return !document.querySelector('dialog[open]')
+    && Array.from(event.dataTransfer?.types || []).includes('Files');
+}
+
+function canAcceptFileDrop(event) {
+  return hasDraggedFiles(event)
+    && (state.doc
+      ? event.currentTarget === window
+      : event.currentTarget === els.emptyDropZone);
+}
+
+function setFileDragActive(active) {
+  const isDocumentDrop = active && Boolean(state.doc);
+  els.dropOverlay.hidden = !isDocumentDrop;
+  els.emptyDropZone.classList.toggle('is-dragging', active && !state.doc);
+}
+
+function handleFileDragEnter(event) {
+  if (!canAcceptFileDrop(event)) return;
+  event.preventDefault();
+  if (state.doc) fileDragDepth += 1;
+  setFileDragActive(true);
+}
+
+function handleFileDragOver(event) {
+  if (!canAcceptFileDrop(event)) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'copy';
+}
+
+function handleFileDragLeave(event) {
+  if (state.doc) {
+    if (!fileDragDepth) return;
+    event.preventDefault();
+    fileDragDepth = Math.max(0, fileDragDepth - 1);
+    if (!fileDragDepth) setFileDragActive(false);
+    return;
+  }
+
+  if (event.currentTarget !== els.emptyDropZone) return;
+  event.preventDefault();
+  if (event.relatedTarget && els.emptyDropZone.contains(event.relatedTarget)) return;
+  setFileDragActive(false);
+}
+
+function handleFileDrop(event) {
+  if (!canAcceptFileDrop(event)) return;
+  const [file] = event.dataTransfer?.files || [];
+  event.preventDefault();
+  resetFileDragState();
+  if (file) loadFile(file);
+}
+
+function resetFileDragState() {
+  fileDragDepth = 0;
+  setFileDragActive(false);
+}
+
 function setSidebarCollapsed(collapsed) {
   const canCollapse = !isDrawerMode();
   state.sidebarCollapsed = Boolean(collapsed);
@@ -881,7 +928,7 @@ function render() {
     activeObserver?.disconnect();
     els.emptyState.hidden = false;
     els.documentView.hidden = true;
-    els.topResetDocumentBtn.hidden = true;
+    els.topCloseDocumentBtn.hidden = true;
     state.renderedDoc = null;
     state.renderedLanguage = null;
     state.renderedNavKey = '';
@@ -897,7 +944,7 @@ function render() {
   const shouldRenderConversation = state.renderedDoc !== state.doc || state.renderedLanguage !== state.lang;
   els.emptyState.hidden = true;
   els.documentView.hidden = false;
-  els.topResetDocumentBtn.hidden = false;
+  els.topCloseDocumentBtn.hidden = false;
 
   if (shouldRenderConversation) {
     els.docTitle.textContent = state.doc.title;
@@ -1335,13 +1382,13 @@ function clearSearch(options = {}) {
   els.searchInput.focus();
 }
 
-function requestResetDocument() {
+function requestCloseDocument() {
   if (!state.doc) return;
-  if (showDialog(els.resetDocumentDialog, els.topResetDocumentBtn, els.cancelResetDocumentBtn)) return;
-  if (window.confirm(t('resetConfirmTitle'))) resetLoadedDocument();
+  if (showDialog(els.closeDocumentDialog, els.topCloseDocumentBtn, els.cancelCloseDocumentBtn)) return;
+  if (window.confirm(t('closeConfirmTitle'))) closeLoadedDocument();
 }
 
-function resetLoadedDocument() {
+function closeLoadedDocument() {
   activeObserver?.disconnect();
   state.doc = null;
   state.role = 'all';
@@ -1350,8 +1397,8 @@ function resetLoadedDocument() {
   els.metaDetails.open = false;
   updateRoleFilter(null);
   render();
-  setStatus(t('resetComplete'));
-  showToast(t('resetComplete'));
+  setStatus(t('closeComplete'));
+  showToast(t('closeComplete'));
 }
 
 function jumpSearchResult(direction) {

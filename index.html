@@ -31,8 +31,8 @@
       </div>
 
       <div class="top-actions">
-        <button class="icon-button button-danger top-reset-document" id="topResetDocumentBtn" type="button" data-i18n-attr="aria-label:resetDocument;title:resetDocument" hidden>
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.2 3.8A2 2 0 0 1 11 2.7h2a2 2 0 0 1 1.8 1.1l.4.8h3.4a.9.9 0 1 1 0 1.8H5.4a.9.9 0 1 1 0-1.8h3.4l.4-.8Zm1.7.8h2.2l-.1-.1a.2.2 0 0 0-.1-.1h-1.8a.2.2 0 0 0-.1.1l-.1.1ZM7.4 8.1a.9.9 0 0 1 1 .8l.5 9.3c0 .5.4.9.9.9h4.4c.5 0 .9-.4.9-.9l.5-9.3a.9.9 0 1 1 1.8.1l-.5 9.3a2.7 2.7 0 0 1-2.7 2.6H9.8a2.7 2.7 0 0 1-2.7-2.6L6.6 9a.9.9 0 0 1 .8-.9Zm3.3 2a.9.9 0 0 1 .9.9v5.5a.9.9 0 1 1-1.8 0V11a.9.9 0 0 1 .9-.9Zm2.6 0a.9.9 0 0 1 .9.9v5.5a.9.9 0 1 1-1.8 0V11a.9.9 0 0 1 .9-.9Z"/></svg>
+        <button class="icon-button top-close-document" id="topCloseDocumentBtn" type="button" data-i18n-attr="aria-label:closeDocument;title:closeDocument" hidden>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.2 4.9a.9.9 0 0 0-1.3 1.3L10.7 12l-5.8 5.8a.9.9 0 1 0 1.3 1.3l5.8-5.8 5.8 5.8a.9.9 0 0 0 1.3-1.3L13.3 12l5.8-5.8a.9.9 0 1 0-1.3-1.3L12 10.7 6.2 4.9Z"/></svg>
         </button>
         <button class="button button-primary" id="openFileBtn" type="button" data-i18n-attr="aria-label:openFile;title:openFile">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h4.1c.7 0 1.3.3 1.8.7L14.7 6h2.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-11Zm2.5-.7a.7.7 0 0 0-.7.7v11c0 .4.3.7.7.7h11c.4 0 .7-.3.7-.7v-8c0-.4-.3-.7-.7-.7H14c-.2 0-.5-.1-.6-.3l-2.3-2.3a.8.8 0 0 0-.5-.2H6.5Z"/></svg>
@@ -73,15 +73,15 @@
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10.8 4.2a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2Zm0 1.8a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm5 9.2 3.7 3.7a.9.9 0 1 1-1.3 1.3l-3.7-3.7a.9.9 0 0 1 1.3-1.3Z"/></svg>
         </button>
       </nav>
-      <aside class="sidebar" id="sidebar" aria-label="Library" data-i18n-attr="aria-label:sidebarTitle">
+      <aside class="sidebar" id="sidebar" aria-label="Navigation" data-i18n-attr="aria-label:sidebarTitle">
         <div class="sidebar-desktop-header">
-          <strong data-i18n="sidebarTitle">Library</strong>
+          <strong data-i18n="sidebarTitle">Navigation</strong>
           <button class="icon-button" id="sidebarCollapseBtn" type="button" data-i18n-attr="aria-label:hideSidebar;title:hideSidebar">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5v-13Zm4.8-.7H6.5a.7.7 0 0 0-.7.7v13c0 .4.3.7.7.7h2.3V4.8Zm1.8 14.4h6.9c.4 0 .7-.3.7-.7v-13c0-.4-.3-.7-.7-.7h-6.9v14.4Zm4.9-10.1a.9.9 0 0 1 0 1.3L13.9 12l1.6 1.6a.9.9 0 1 1-1.3 1.3L12 12.6a.9.9 0 0 1 0-1.2l2.2-2.3a.9.9 0 0 1 1.3 0Z"/></svg>
           </button>
         </div>
         <div class="sidebar-header">
-          <strong data-i18n="sidebarTitle">Library</strong>
+          <strong data-i18n="sidebarTitle">Navigation</strong>
           <button class="icon-button drawer-open-file" id="drawerOpenFileBtn" type="button" data-i18n-attr="aria-label:openFile;title:openFile">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h4.1c.7 0 1.3.3 1.8.7L14.7 6h2.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-11Zm2.5-.7a.7.7 0 0 0-.7.7v11c0 .4.3.7.7.7h11c.4 0 .7-.3.7-.7v-8c0-.4-.3-.7-.7-.7H14c-.2 0-.5-.1-.6-.3l-2.3-2.3a.8.8 0 0 0-.5-.2H6.5Z"/></svg>
           </button>
@@ -156,7 +156,7 @@
               <form class="url-form" id="urlForm">
                 <label class="field">
                   <span data-i18n="urlLabel">Markdown URL</span>
-                  <input id="urlInput" type="url" inputmode="url" placeholder="https://.../chat.md" autocomplete="off">
+                  <input id="urlInput" type="text" inputmode="url" placeholder="https://.../chat.md" autocomplete="off">
                 </label>
                 <button class="button button-secondary" type="submit">
                   <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 5.2a.9.9 0 1 1 0-1.8h5.1c.5 0 .9.4.9.9v5.1a.9.9 0 0 1-1.8 0V6.5l-8 8a.9.9 0 1 1-1.3-1.3l8-8H14ZM5.8 5.8v12.4h12.4v-4.5a.9.9 0 0 1 1.8 0v4.8c0 .8-.7 1.5-1.5 1.5h-13c-.8 0-1.5-.7-1.5-1.5v-13C4 4.7 4.7 4 5.5 4h4.8a.9.9 0 1 1 0 1.8H5.8Z"/></svg>
@@ -217,13 +217,14 @@
         <div class="empty-state" id="emptyState">
           <div class="empty-drop-zone" id="emptyDropZone">
             <img src="assets/icon.svg" width="72" height="72" alt="">
-            <h1 data-i18n="emptyTitle">Open a Markdown chat log</h1>
-            <p data-i18n="emptyBody">Files stay in this browser.</p>
-            <button class="button button-primary" id="emptyOpenFileBtn" type="button" data-i18n-attr="aria-label:openFile;title:openFile">
+            <h1 data-i18n="emptyTitle">Open a chat log</h1>
+            <p class="empty-drop-hint" data-i18n="dropFileHint">Drop a Markdown file here</p>
+            <button class="button button-primary" id="emptyOpenFileBtn" type="button" data-i18n-attr="aria-label:chooseFile;title:chooseFile">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h4.1c.7 0 1.3.3 1.8.7L14.7 6h2.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-11Zm2.5-.7a.7.7 0 0 0-.7.7v11c0 .4.3.7.7.7h11c.4 0 .7-.3.7-.7v-8c0-.4-.3-.7-.7-.7H14c-.2 0-.5-.1-.6-.3l-2.3-2.3a.8.8 0 0 0-.5-.2H6.5Z"/></svg>
-              <span data-i18n="openFile">Open Markdown</span>
+              <span data-i18n="chooseFile">Choose file</span>
             </button>
             <span class="empty-formats" data-i18n="emptyFormats">ChatGPT Markdown / plain Markdown</span>
+            <p class="empty-privacy" data-i18n="emptyBody">Local files are processed in this browser.</p>
           </div>
         </div>
 
@@ -253,11 +254,18 @@
     <div class="sidebar-scrim" id="sidebarScrim" hidden></div>
   </div>
 
+  <div class="drop-overlay" id="dropOverlay" role="status" aria-live="polite" hidden>
+    <div class="drop-overlay-panel">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h4.1c.7 0 1.3.3 1.8.7L14.7 6h2.8A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-11Zm2.5-.7a.7.7 0 0 0-.7.7v11c0 .4.3.7.7.7h11c.4 0 .7-.3.7-.7v-8c0-.4-.3-.7-.7-.7H14c-.2 0-.5-.1-.6-.3l-2.3-2.3a.8.8 0 0 0-.5-.2H6.5Z"/></svg>
+      <strong data-i18n="dropFileHere">Drop to open this Markdown file</strong>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <section class="update-notice" id="updateNotice" role="region" aria-live="polite" data-i18n-attr="aria-label:updateAvailableTitle" hidden>
     <div>
       <strong data-i18n="updateAvailableTitle">A new version is ready</strong>
-      <p data-i18n="updateAvailableBody">Updating closes the current local Markdown view, but never changes or deletes the original file.</p>
+      <p data-i18n="updateAvailableBody">Updating closes the current log. The original Markdown file will not be changed or deleted.</p>
     </div>
     <div class="update-notice-actions">
       <button class="button button-quiet" id="updateLaterBtn" type="button" data-i18n="updateLater">Later</button>
@@ -287,20 +295,20 @@
       </a>
     </div>
   </dialog>
-  <dialog class="confirm-dialog" id="resetDocumentDialog" aria-labelledby="resetDocumentDialogTitle" aria-describedby="resetDocumentDialogBody">
+  <dialog class="confirm-dialog" id="closeDocumentDialog" aria-labelledby="closeDocumentDialogTitle" aria-describedby="closeDocumentDialogBody">
     <div class="confirm-card" role="document">
       <div class="confirm-head">
         <div class="confirm-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M9.2 3.8A2 2 0 0 1 11 2.7h2a2 2 0 0 1 1.8 1.1l.4.8h3.4a.9.9 0 1 1 0 1.8H5.4a.9.9 0 1 1 0-1.8h3.4l.4-.8Zm1.7.8h2.2l-.1-.1a.2.2 0 0 0-.1-.1h-1.8a.2.2 0 0 0-.1.1l-.1.1ZM7.4 8.1a.9.9 0 0 1 1 .8l.5 9.3c0 .5.4.9.9.9h4.4c.5 0 .9-.4.9-.9l.5-9.3a.9.9 0 1 1 1.8.1l-.5 9.3a2.7 2.7 0 0 1-2.7 2.6H9.8a2.7 2.7 0 0 1-2.7-2.6L6.6 9a.9.9 0 0 1 .8-.9Z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M6.2 4.9a.9.9 0 0 0-1.3 1.3L10.7 12l-5.8 5.8a.9.9 0 1 0 1.3 1.3l5.8-5.8 5.8 5.8a.9.9 0 0 0 1.3-1.3L13.3 12l5.8-5.8a.9.9 0 1 0-1.3-1.3L12 10.7 6.2 4.9Z"/></svg>
         </div>
         <div>
-          <h2 id="resetDocumentDialogTitle" data-i18n="resetConfirmTitle">Reset the loaded Markdown?</h2>
-          <p id="resetDocumentDialogBody" data-i18n="resetConfirmBody">The current log will close and the start screen will be shown. The original file will not be deleted.</p>
+          <h2 id="closeDocumentDialogTitle" data-i18n="closeConfirmTitle">Close this log?</h2>
+          <p id="closeDocumentDialogBody" data-i18n="closeConfirmBody">The current log will close and the start screen will be shown. The original file will not be changed or deleted.</p>
         </div>
       </div>
       <div class="confirm-actions">
-        <button class="button button-quiet" id="cancelResetDocumentBtn" type="button" data-i18n="cancel">Cancel</button>
-        <button class="button button-danger button-danger-solid" id="confirmResetDocumentBtn" type="button" data-i18n="resetDocumentConfirm">Reset</button>
+        <button class="button button-quiet" id="cancelCloseDocumentBtn" type="button" data-i18n="cancel">Cancel</button>
+        <button class="button button-primary" id="confirmCloseDocumentBtn" type="button" data-i18n="closeDocumentConfirm">Close log</button>
       </div>
     </div>
   </dialog>
