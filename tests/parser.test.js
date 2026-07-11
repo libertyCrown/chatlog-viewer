@@ -31,7 +31,7 @@ test('ignores ## User: inside a backtick fenced code block', () => {
 
   assert.equal(doc.messages.length, 2);
   assert.match(doc.messages[1].raw, /## User:/);
-  assert.match(doc.messages[1].searchText, /## user:/);
+  assert.match(doc.messages[1].plain, /## User:/);
 });
 
 test('ignores ## Response: inside a tilde fenced code block', () => {
@@ -71,10 +71,18 @@ test('preserves searchable long-form Markdown content inside messages', () => {
   const doc = parseChatMarkdown(`## Prompt:\n\nPlease inspect this.\n\n## Response:\n\n> quoted text\n\n- first item\n- second item\n\n| Name | Value |\n| --- | --- |\n| alpha | beta |\n\n\`\`\`json\n{ "error": "example" }\n\`\`\``, 'long.md', 'utf-8');
 
   assert.equal(doc.messages.length, 2);
-  assert.match(doc.messages[1].searchText, /quoted text/);
-  assert.match(doc.messages[1].searchText, /alpha/);
-  assert.match(doc.messages[1].searchText, /beta/);
-  assert.match(doc.messages[1].searchText, /"error": "example"/);
+  assert.match(doc.messages[1].plain, /quoted text/);
+  assert.match(doc.messages[1].plain, /alpha/);
+  assert.match(doc.messages[1].plain, /beta/);
+  assert.match(doc.messages[1].plain, /"error": "example"/);
+});
+
+test('does not retain duplicate normalized or navigation text for every message', () => {
+  const doc = parseChatMarkdown('## Prompt:\n\nHello 👋\n\n## Response:\n\nWorld', 'memory.md', 'utf-8');
+
+  assert.equal('searchText' in doc.messages[0], false);
+  assert.equal('navExcerpt' in doc.messages[0], false);
+  assert.equal(doc.messages[0].chars, 7);
 });
 
 test('normalizes speaker identity separately from display names', () => {

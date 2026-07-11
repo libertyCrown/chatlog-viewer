@@ -324,6 +324,7 @@ const NAV_ITEM_GAP = 8;
 const NAV_ROW_HEIGHT = NAV_ITEM_HEIGHT + NAV_ITEM_GAP;
 const NAV_OVERSCAN = 8;
 const NAV_VIRTUAL_THRESHOLD = 120;
+const NAV_EXCERPT_LENGTH = 180;
 const navState = {
   messages: [],
   virtual: false,
@@ -334,6 +335,8 @@ const navState = {
 
 const dialogReturnFocus = new Map();
 const DRAWER_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+let numberFormatter = null;
+let numberFormatterLanguage = '';
 
 function initialLanguage() {
   const stored = localStorage.getItem(STORAGE.language);
@@ -1087,15 +1090,19 @@ function highlightMessageBody(body, query) {
   }
 
   const matches = findNormalizedMatches(textNodes.map((item) => item.node.nodeValue).join(''), query);
+  let firstMatchIndex = 0;
   textNodes.forEach((item) => {
-    const pieces = matches
-      .map((match, occurrence) => ({
-        occurrence,
-        start: Math.max(item.start, match.start),
-        end: Math.min(item.end, match.end)
-      }))
-      .filter((piece) => piece.start < piece.end)
-      .sort((a, b) => a.start - b.start);
+    while (firstMatchIndex < matches.length && matches[firstMatchIndex].end <= item.start) {
+      firstMatchIndex += 1;
+    }
+
+    const pieces = [];
+    for (let index = firstMatchIndex; index < matches.length && matches[index].start < item.end; index += 1) {
+      const match = matches[index];
+      const start = Math.max(item.start, match.start);
+      const end = Math.min(item.end, match.end);
+      if (start < end) pieces.push({ occurrence: index, start, end });
+    }
     if (!pieces.length) return;
 
     const fragment = document.createDocumentFragment();
@@ -1181,7 +1188,7 @@ function createMessageNavItem(message) {
 
   const excerpt = document.createElement('span');
   excerpt.className = 'nav-excerpt';
-  excerpt.textContent = message.navExcerpt || message.plain || message.raw;
+  excerpt.textContent = (message.plain || message.raw).slice(0, NAV_EXCERPT_LENGTH);
 
   row.append(chip, turn);
   button.append(row, excerpt);
@@ -1591,7 +1598,11 @@ function unescapeHtml(value) {
 }
 
 function formatNumber(value) {
-  return new Intl.NumberFormat(state.lang).format(value || 0);
+  if (numberFormatterLanguage !== state.lang) {
+    numberFormatter = new Intl.NumberFormat(state.lang);
+    numberFormatterLanguage = state.lang;
+  }
+  return numberFormatter.format(value || 0);
 }
 
 async function copyText(text) {

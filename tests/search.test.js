@@ -36,6 +36,15 @@ test('collects multiple matches, including code-like text', () => {
   assert.deepEqual(results.map((result) => result.messageId), ['message-1', 'message-1', 'message-2']);
 });
 
+test('collects many matches from one long code-style message', () => {
+  const plain = Array.from({ length: 1200 }, (_, index) => `const value${index} = needle;`).join('\n');
+  const results = collectSearchResults([{ id: 'message-code', speakerId: 'speaker-1', plain }], 'needle');
+
+  assert.equal(results.length, 1200);
+  assert.equal(results[0].messageId, 'message-code');
+  assert.equal(results.at(-1).occurrence, 1199);
+});
+
 test('combines speaker filtering with the matching-message-only option', () => {
   const messages = [
     { id: 'message-1', speakerId: 'speaker-1' },
