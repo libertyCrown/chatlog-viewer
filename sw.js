@@ -1,11 +1,18 @@
 'use strict';
 
-const CACHE_NAME = 'chatlog-viewer-v6';
+importScripts('./app-version.js');
+
+const CACHE_NAME = `chatlog-viewer-${self.ChatLogViewerVersion.cacheKey}`;
 const APP_SHELL = [
   './',
   './index.html',
   './styles.css',
+  './app-version.js',
   './app.js',
+  './lib/search.js',
+  './lib/url.js',
+  './lib/parser.js',
+  './lib/pwa-update.js',
   './manifest.webmanifest',
   './assets/icon.svg',
   './assets/icon-192.png',
@@ -18,8 +25,12 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type !== 'SKIP_WAITING') return;
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event) => {

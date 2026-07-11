@@ -250,11 +250,24 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <section class="update-notice" id="updateNotice" role="region" aria-live="polite" data-i18n-attr="aria-label:updateAvailableTitle" hidden>
+    <div>
+      <strong data-i18n="updateAvailableTitle">A new version is ready</strong>
+      <p data-i18n="updateAvailableBody">Updating closes the current local Markdown view, but never changes or deletes the original file.</p>
+    </div>
+    <div class="update-notice-actions">
+      <button class="button button-quiet" id="updateLaterBtn" type="button" data-i18n="updateLater">Later</button>
+      <button class="button button-primary" id="updateNowBtn" type="button" data-i18n="updateNow">Update</button>
+    </div>
+  </section>
   <dialog class="about-dialog" id="aboutDialog" aria-labelledby="aboutDialogTitle" aria-describedby="aboutDialogBody">
     <div class="about-card" role="document">
       <div class="about-head">
         <img src="assets/icon.svg" width="48" height="48" alt="">
-        <h2 id="aboutDialogTitle">ChatLog Viewer</h2>
+        <div class="about-title-group">
+          <h2 id="aboutDialogTitle">ChatLog Viewer</h2>
+          <p class="about-version" id="aboutVersion">Version</p>
+        </div>
         <button class="icon-button about-close" id="closeAboutDialogBtn" type="button" data-i18n-attr="aria-label:close;title:close">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.2 4.9a.9.9 0 0 0-1.3 1.3L10.7 12l-5.8 5.8a.9.9 0 1 0 1.3 1.3l5.8-5.8 5.8 5.8a.9.9 0 0 0 1.3-1.3L13.3 12l5.8-5.8a.9.9 0 1 0-1.3-1.3L12 10.7 6.2 4.9Z"/></svg>
         </button>
@@ -287,9 +300,11 @@
       </div>
     </div>
   </dialog>
+  <script src="app-version.js" defer></script>
   <script src="lib/search.js" defer></script>
   <script src="lib/url.js" defer></script>
   <script src="lib/parser.js" defer></script>
+  <script src="lib/pwa-update.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>

@@ -20,7 +20,13 @@ const I18N = {
     aboutLine1: 'A lightweight local viewer for',
     aboutLine2: 'reviewing chat logs saved',
     aboutLine3: 'as Markdown.',
+    appVersion: 'Version {version}',
     viewOnGitHub: 'View on GitHub',
+    updateAvailableTitle: 'A new version is ready',
+    updateAvailableBody: 'Updating closes the current local Markdown view, but never changes or deletes the original file.',
+    updateNow: 'Update',
+    updateLater: 'Later',
+    updateApplying: 'Updating...',
     openFile: 'Open Markdown',
     install: 'Install',
     language: 'Language',
@@ -107,7 +113,13 @@ const I18N = {
     aboutLine1: 'Markdown形式で保存された',
     aboutLine2: 'チャットログを読み返すための',
     aboutLine3: '軽量なローカルビューアです。',
+    appVersion: 'バージョン {version}',
     viewOnGitHub: 'GitHubで見る',
+    updateAvailableTitle: '新しいバージョンがあります',
+    updateAvailableBody: '更新すると、現在表示中のローカルMarkdownは閉じます。元のファイル自体は変更・削除されません。',
+    updateNow: '更新する',
+    updateLater: '後で',
+    updateApplying: '更新しています…',
     openFile: 'Markdownを開く',
     install: 'インストール',
     language: '言語',
@@ -193,12 +205,15 @@ const I18N = {
 const { parseChatMarkdown } = globalThis.ChatLogParser;
 const { normalizeForSearch } = globalThis.ChatLogSearch;
 const { safeUrl: safeUrlForBase } = globalThis.ChatLogUrl;
+const APP_VERSION = globalThis.ChatLogViewerVersion;
+const { shouldOfferUpdate, shouldReloadAfterUpdate } = globalThis.ChatLogPwaUpdate;
 
 const els = {
   html: document.documentElement,
   body: document.body,
   aboutAppBtn: document.getElementById('aboutAppBtn'),
   aboutDialog: document.getElementById('aboutDialog'),
+  aboutVersion: document.getElementById('aboutVersion'),
   closeAboutDialogBtn: document.getElementById('closeAboutDialogBtn'),
   sidebarRail: document.getElementById('sidebarRail'),
   sidebar: document.getElementById('sidebar'),
@@ -248,7 +263,10 @@ const els = {
   statTurns: document.getElementById('statTurns'),
   statChars: document.getElementById('statChars'),
   statusLine: document.getElementById('statusLine'),
-  toast: document.getElementById('toast')
+  toast: document.getElementById('toast'),
+  updateNotice: document.getElementById('updateNotice'),
+  updateNowBtn: document.getElementById('updateNowBtn'),
+  updateLaterBtn: document.getElementById('updateLaterBtn')
 };
 
 const state = {
@@ -264,7 +282,11 @@ const state = {
   deferredInstallPrompt: null,
   activeId: null,
   sidebarCollapsed: localStorage.getItem(STORAGE.sidebarCollapsed) === 'true',
-  drawerOpen: false
+  drawerOpen: false,
+  serviceWorkerRegistration: null,
+  updateNoticeDismissed: false,
+  updateAccepted: false,
+  updateReloadStarted: false
 };
 
 let searchTimer = null;
@@ -322,6 +344,7 @@ function applyI18n() {
     button.title = t('themeDark');
     button.setAttribute('aria-label', t('themeDark'));
   });
+  els.aboutVersion.textContent = t('appVersion', { version: APP_VERSION.value });
   if (!state.doc) setStatus(t('ready'));
   if (state.doc) updateRoleFilter(state.doc);
   render();
@@ -541,6 +564,8 @@ function bindEvents() {
 
   els.installBtn.addEventListener('click', promptInstall);
   els.drawerInstallBtn.addEventListener('click', promptInstall);
+  els.updateNowBtn.addEventListener('click', acceptServiceWorkerUpdate);
+  els.updateLaterBtn.addEventListener('click', dismissServiceWorkerUpdate);
 
   window.addEventListener('appinstalled', () => {
     els.installBtn.hidden = true;
@@ -553,6 +578,36 @@ function showAboutDialog() {
   if (typeof els.aboutDialog.showModal === 'function') {
     els.aboutDialog.showModal();
   }
+}
+
+function showServiceWorkerUpdate(registration) {
+  if (!shouldOfferUpdate({
+    hasWaitingWorker: Boolean(registration?.waiting),
+    hasController: Boolean(navigator.serviceWorker?.controller),
+    dismissed: state.updateNoticeDismissed
+  })) return;
+
+  state.serviceWorkerRegistration = registration;
+  els.updateNowBtn.disabled = false;
+  els.updateLaterBtn.disabled = false;
+  els.updateNotice.hidden = false;
+  setStatus(t('updateAvailableTitle'));
+}
+
+function dismissServiceWorkerUpdate() {
+  state.updateNoticeDismissed = true;
+  els.updateNotice.hidden = true;
+}
+
+function acceptServiceWorkerUpdate() {
+  const waitingWorker = state.serviceWorkerRegistration?.waiting;
+  if (!waitingWorker) return;
+
+  state.updateAccepted = true;
+  els.updateNowBtn.disabled = true;
+  els.updateLaterBtn.disabled = true;
+  setStatus(t('updateApplying'));
+  waitingWorker.postMessage({ type: 'SKIP_WAITING' });
 }
 
 async function promptInstall() {
@@ -1312,7 +1367,29 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
   if (!['http:', 'https:'].includes(location.protocol)) return;
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch((error) => console.warn(error));
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+      .then((registration) => {
+        state.serviceWorkerRegistration = registration;
+        showServiceWorkerUpdate(registration);
+        registration.addEventListener('updatefound', () => {
+          const installingWorker = registration.installing;
+          if (!installingWorker) return;
+          installingWorker.addEventListener('statechange', () => {
+            if (installingWorker.state === 'installed') showServiceWorkerUpdate(registration);
+          });
+        });
+        registration.update().catch((error) => console.warn(error));
+      })
+      .catch((error) => console.warn(error));
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!shouldReloadAfterUpdate({
+      updateAccepted: state.updateAccepted,
+      reloadStarted: state.updateReloadStarted
+    })) return;
+
+    state.updateReloadStarted = true;
+    window.location.reload();
   });
 }
 
