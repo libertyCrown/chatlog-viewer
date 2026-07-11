@@ -678,6 +678,28 @@ a:focus-visible {
   margin-top: 10px;
 }
 
+.match-only-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: .84rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.match-only-toggle input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.match-only-toggle input:disabled + span {
+  opacity: .55;
+}
+
 #clearSearchBtn {
   width: 100%;
   white-space: nowrap;
@@ -1263,6 +1285,11 @@ a:focus-visible {
   color: #24210f;
   border-radius: 4px;
   padding: 0 .15em;
+}
+
+.message-body mark.is-current {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 .reader.compact .conversation {

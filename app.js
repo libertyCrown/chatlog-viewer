@@ -52,8 +52,10 @@ const I18N = {
     ready: 'Ready',
     search: 'Search',
     searchResults: 'Search results: {shown}',
+    searchPosition: 'Search results: {current} / {total}',
     visibleResults: 'Showing: {shown} / {total}',
     searchResultsEmpty: 'Search results: 0',
+    showMatchesOnly: 'Show matching messages only',
     previousResult: 'Previous result',
     nextResult: 'Next result',
     role: 'Role',
@@ -145,8 +147,10 @@ const I18N = {
     ready: '待機中',
     search: '検索',
     searchResults: '検索結果: {shown}件',
+    searchPosition: '検索結果: {current} / {total}',
     visibleResults: '表示中: {shown} / {total}',
     searchResultsEmpty: '検索結果: 0',
+    showMatchesOnly: '一致した発言だけ表示',
     previousResult: '前の検索結果',
     nextResult: '次の検索結果',
     role: '種類',
@@ -203,7 +207,13 @@ const I18N = {
 };
 
 const { parseChatMarkdown } = globalThis.ChatLogParser;
-const { normalizeForSearch } = globalThis.ChatLogSearch;
+const {
+  collectSearchResults,
+  filterMessages,
+  findNormalizedMatches,
+  nextSearchIndex,
+  normalizeForSearch
+} = globalThis.ChatLogSearch;
 const { safeUrl: safeUrlForBase } = globalThis.ChatLogUrl;
 const APP_VERSION = globalThis.ChatLogViewerVersion;
 const { shouldOfferUpdate, shouldReloadAfterUpdate } = globalThis.ChatLogPwaUpdate;
@@ -245,6 +255,7 @@ const els = {
   nextResultBtn: document.getElementById('nextResultBtn'),
   roleFilter: document.getElementById('roleFilter'),
   clearSearchBtn: document.getElementById('clearSearchBtn'),
+  matchOnlyToggle: document.getElementById('matchOnlyToggle'),
   messageList: document.getElementById('messageList'),
   emptyState: document.getElementById('emptyState'),
   documentView: document.getElementById('documentView'),
@@ -276,8 +287,11 @@ const state = {
   encoding: localStorage.getItem(STORAGE.encoding) || 'auto',
   doc: null,
   query: '',
+  normalizedQuery: '',
   role: 'all',
-  filteredIds: [],
+  searchResults: [],
+  matchingMessageIds: new Set(),
+  showMatchesOnly: false,
   searchIndex: -1,
   deferredInstallPrompt: null,
   activeId: null,
@@ -286,7 +300,13 @@ const state = {
   serviceWorkerRegistration: null,
   updateNoticeDismissed: false,
   updateAccepted: false,
-  updateReloadStarted: false
+  updateReloadStarted: false,
+  renderedDoc: null,
+  renderedLanguage: null,
+  renderedNavKey: '',
+  renderedVisibilityKey: '',
+  highlightedQuery: '',
+  highlightedMessageIds: new Set()
 };
 
 let searchTimer = null;
@@ -392,6 +412,7 @@ function init() {
   applyDensity();
   setDrawerOpen(false);
   setSidebarCollapsed(state.sidebarCollapsed);
+  resetSearchState();
   applyI18n();
   updateRoleFilter(null);
   bindEvents();
@@ -419,11 +440,6 @@ function bindEvents() {
   });
   window.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && state.drawerOpen) setDrawerOpen(false);
-    if (event.key === '/' && !isTypingTarget(event.target)) {
-      event.preventDefault();
-      setSidebarCollapsed(false);
-      els.searchInput.focus();
-    }
     if (event.key === 'Enter' && document.activeElement === els.searchInput) {
       event.preventDefault();
       clearTimeout(searchTimer);
@@ -431,6 +447,7 @@ function bindEvents() {
       if (state.query !== nextQuery) {
         state.query = nextQuery;
         state.searchIndex = -1;
+        updateSearchResults();
         render();
       }
       jumpSearchResult(event.shiftKey ? -1 : 1);
@@ -511,6 +528,7 @@ function bindEvents() {
     searchTimer = setTimeout(() => {
       state.query = els.searchInput.value.trim();
       state.searchIndex = -1;
+      updateSearchResults();
       render();
     }, 150);
   });
@@ -520,6 +538,12 @@ function bindEvents() {
 
   els.roleFilter.addEventListener('change', () => {
     state.role = els.roleFilter.value;
+    state.searchIndex = -1;
+    render();
+  });
+
+  els.matchOnlyToggle.addEventListener('change', () => {
+    state.showMatchesOnly = els.matchOnlyToggle.checked;
     state.searchIndex = -1;
     render();
   });
@@ -667,13 +691,6 @@ function isDrawerMode() {
   return window.matchMedia('(max-width: 860px)').matches;
 }
 
-function isTypingTarget(target) {
-  return target instanceof HTMLInputElement
-    || target instanceof HTMLTextAreaElement
-    || target instanceof HTMLSelectElement
-    || target?.isContentEditable;
-}
-
 async function openFile() {
   if ('showOpenFilePicker' in window && window.isSecureContext) {
     try {
@@ -700,12 +717,13 @@ async function loadFile(file) {
     const buffer = await file.arrayBuffer();
     const decoded = decodeBuffer(buffer, state.encoding);
     const doc = parseChatMarkdown(decoded.text, file.name, decoded.encoding, { untitledTitle: t('titleUntitled') });
+    prepareDocument(doc);
     state.doc = doc;
-    state.query = '';
     state.role = 'all';
     state.activeId = null;
-    state.searchIndex = -1;
-    els.searchInput.value = '';
+    state.renderedDoc = null;
+    state.renderedNavKey = '';
+    resetSearchState();
     updateRoleFilter(doc);
     render();
     setDrawerOpen(false);
@@ -737,12 +755,14 @@ async function loadUrl(input) {
     const buffer = await response.arrayBuffer();
     const decoded = decodeBuffer(buffer, state.encoding);
     const name = decodeURIComponent(url.pathname.split('/').pop() || 'remote.md');
-    state.doc = parseChatMarkdown(decoded.text, name, decoded.encoding, { untitledTitle: t('titleUntitled') });
-    state.query = '';
+    const doc = parseChatMarkdown(decoded.text, name, decoded.encoding, { untitledTitle: t('titleUntitled') });
+    prepareDocument(doc);
+    state.doc = doc;
     state.role = 'all';
     state.activeId = null;
-    state.searchIndex = -1;
-    els.searchInput.value = '';
+    state.renderedDoc = null;
+    state.renderedNavKey = '';
+    resetSearchState();
     updateRoleFilter(state.doc);
     render();
     setDrawerOpen(false);
@@ -787,27 +807,44 @@ function render() {
     els.emptyState.hidden = false;
     els.documentView.hidden = true;
     els.topResetDocumentBtn.hidden = true;
-    state.filteredIds = [];
+    state.renderedDoc = null;
+    state.renderedLanguage = null;
+    state.renderedNavKey = '';
+    state.renderedVisibilityKey = '';
+    state.highlightedMessageIds = new Set();
+    state.highlightedQuery = '';
     renderStats(null);
     renderResultStatus([]);
     resetMessageNav();
     return;
   }
 
-  const filtered = filteredMessages();
-  state.filteredIds = filtered.map((message) => message.id);
+  const shouldRenderConversation = state.renderedDoc !== state.doc || state.renderedLanguage !== state.lang;
   els.emptyState.hidden = true;
   els.documentView.hidden = false;
   els.topResetDocumentBtn.hidden = false;
-  els.docTitle.textContent = state.doc.title;
-  els.sourceLabel.textContent = `${state.doc.sourceName} / ${state.doc.encoding}`;
-  renderSourceLink();
-  renderMeta();
-  renderConversation(filtered);
-  renderMessageNav(filtered);
+
+  if (shouldRenderConversation) {
+    els.docTitle.textContent = state.doc.title;
+    els.sourceLabel.textContent = `${state.doc.sourceName} / ${state.doc.encoding}`;
+    renderSourceLink();
+    renderMeta();
+    renderConversation(state.doc.messages);
+    state.renderedDoc = state.doc;
+    state.renderedLanguage = state.lang;
+    state.renderedNavKey = '';
+    state.renderedVisibilityKey = '';
+    state.highlightedMessageIds = new Set();
+    state.highlightedQuery = '';
+  }
+
+  const visible = visibleMessages();
+  applyMessageVisibility(visible, shouldRenderConversation);
+  applySearchHighlights(shouldRenderConversation);
+  renderMessageNavIfNeeded(visible);
   renderStats(state.doc);
-  renderResultStatus(filtered);
-  els.emptyResults.hidden = filtered.length !== 0;
+  renderResultStatus(visible);
+  els.emptyResults.hidden = visible.length !== 0;
 }
 
 function renderSourceLink() {
@@ -850,17 +887,73 @@ function updateRoleFilter(doc) {
   state.role = els.roleFilter.value;
 }
 
-function filteredMessages() {
-  const query = normalizeForSearch(state.query);
-  return state.doc.messages.filter((message) => {
-    const roleMatches = state.role === 'all' || message.speakerId === state.role;
-    const queryMatches = !query || (message.searchText || normalizeForSearch(message.plain)).includes(query);
-    return roleMatches && queryMatches;
+function prepareDocument(doc) {
+  doc.messages.forEach((message) => {
+    message.html = markdownToHtml(message.raw);
+  });
+  doc.messageById = new Map(doc.messages.map((message) => [message.id, message]));
+}
+
+function resetSearchState() {
+  state.query = '';
+  state.normalizedQuery = '';
+  state.searchResults = [];
+  state.matchingMessageIds = new Set();
+  state.showMatchesOnly = false;
+  state.searchIndex = -1;
+  state.highlightedQuery = '';
+  state.highlightedMessageIds = new Set();
+  els.searchInput.value = '';
+  els.matchOnlyToggle.checked = false;
+  els.matchOnlyToggle.disabled = true;
+}
+
+function updateSearchResults() {
+  state.normalizedQuery = normalizeForSearch(state.query);
+  state.searchResults = state.doc && state.normalizedQuery
+    ? collectSearchResults(state.doc.messages, state.query)
+    : [];
+  state.matchingMessageIds = new Set(state.searchResults.map((result) => result.messageId));
+
+  if (!state.normalizedQuery) state.showMatchesOnly = false;
+  els.matchOnlyToggle.checked = state.showMatchesOnly;
+  els.matchOnlyToggle.disabled = !state.normalizedQuery;
+}
+
+function visibleMessages() {
+  return filterMessages(state.doc.messages, {
+    speakerId: state.role,
+    matchOnly: state.showMatchesOnly && Boolean(state.normalizedQuery),
+    matchingMessageIds: state.matchingMessageIds
   });
 }
 
+function visibleSearchResults() {
+  return state.searchResults.filter((result) => state.role === 'all' || result.speakerId === state.role);
+}
+
+function applyMessageVisibility(messages, force = false) {
+  const key = `${state.role}\u0000${state.showMatchesOnly ? state.normalizedQuery : ''}`;
+  if (!force && key === state.renderedVisibilityKey) return;
+
+  const visibleIds = new Set(messages.map((message) => message.id));
+  els.conversation.querySelectorAll('.message-card').forEach((card) => {
+    card.hidden = !visibleIds.has(card.id);
+  });
+  state.renderedVisibilityKey = key;
+}
+
+function renderMessageNavIfNeeded(messages) {
+  const key = `${state.role}\u0000${state.showMatchesOnly ? state.normalizedQuery : ''}`;
+  if (key === state.renderedNavKey) {
+    updateActiveNavItem();
+    return;
+  }
+  state.renderedNavKey = key;
+  renderMessageNav(messages);
+}
+
 function renderConversation(messages) {
-  const query = state.query;
   els.conversation.innerHTML = messages.map((message) => {
     const roleLabel = participantLabel(message);
     const speakerClass = `speaker-${message.participantIndex % 20}`;
@@ -879,11 +972,82 @@ function renderConversation(messages) {
             </button>
           </div>
         </header>
-        <div class="message-body">${markdownToHtml(message.raw, query)}</div>
+        <div class="message-body">${message.html}</div>
       </article>
     `;
   }).join('');
   observeVisibleMessages();
+}
+
+function applySearchHighlights(force = false) {
+  if (!force && state.highlightedQuery === state.normalizedQuery) return;
+
+  const affectedIds = new Set([
+    ...state.highlightedMessageIds,
+    ...state.matchingMessageIds
+  ]);
+
+  affectedIds.forEach((id) => {
+    const message = state.doc.messageById.get(id);
+    const body = document.getElementById(id)?.querySelector('.message-body');
+    if (!message || !body) return;
+
+    body.innerHTML = message.html;
+    if (state.matchingMessageIds.has(id)) highlightMessageBody(body, state.query);
+  });
+
+  state.highlightedMessageIds = new Set(state.matchingMessageIds);
+  state.highlightedQuery = state.normalizedQuery;
+}
+
+function highlightMessageBody(body, query) {
+  const textNodes = [];
+  const walker = document.createTreeWalker(body, globalThis.NodeFilter?.SHOW_TEXT || 4);
+  let node;
+  let offset = 0;
+
+  while ((node = walker.nextNode())) {
+    if (!node.nodeValue) continue;
+    textNodes.push({ node, start: offset, end: offset + node.nodeValue.length });
+    offset += node.nodeValue.length;
+  }
+
+  const matches = findNormalizedMatches(textNodes.map((item) => item.node.nodeValue).join(''), query);
+  textNodes.forEach((item) => {
+    const pieces = matches
+      .map((match, occurrence) => ({
+        occurrence,
+        start: Math.max(item.start, match.start),
+        end: Math.min(item.end, match.end)
+      }))
+      .filter((piece) => piece.start < piece.end)
+      .sort((a, b) => a.start - b.start);
+    if (!pieces.length) return;
+
+    const fragment = document.createDocumentFragment();
+    const text = item.node.nodeValue;
+    let cursor = 0;
+    pieces.forEach((piece) => {
+      const start = piece.start - item.start;
+      const end = piece.end - item.start;
+      if (start > cursor) fragment.append(text.slice(cursor, start));
+      const mark = document.createElement('mark');
+      mark.dataset.searchOccurrence = String(piece.occurrence);
+      mark.textContent = text.slice(start, end);
+      fragment.append(mark);
+      cursor = end;
+    });
+    if (cursor < text.length) fragment.append(text.slice(cursor));
+    item.node.replaceWith(fragment);
+  });
+}
+
+function setCurrentSearchMark(result) {
+  els.conversation.querySelectorAll('mark.is-current').forEach((mark) => mark.classList.remove('is-current'));
+  const card = document.getElementById(result.messageId);
+  const mark = card?.querySelector(`mark[data-search-occurrence="${result.occurrence}"]`);
+  if (mark) mark.classList.add('is-current');
+  (mark || card)?.scrollIntoView({ behavior: 'smooth', block: mark ? 'center' : 'start' });
 }
 
 function renderMessageNav(messages) {
@@ -1035,23 +1199,24 @@ function renderStats(doc) {
   els.statChars.textContent = formatNumber(doc?.chars || 0);
 }
 
-function renderResultStatus(filtered) {
-  const total = state.doc?.messages.length || 0;
-  const shown = filtered.length;
-  const filtering = Boolean(state.query || state.role !== 'all');
-  els.resultLine.textContent = state.query
-    ? t('searchResults', { shown: formatNumber(shown), total: formatNumber(total) })
-    : (filtering ? t('visibleResults', { shown: formatNumber(shown), total: formatNumber(total) }) : t('searchResultsEmpty'));
-  const hasResults = filtering && shown > 0;
+function renderResultStatus(visible) {
+  const results = visibleSearchResults();
+  const filtering = state.role !== 'all';
+  const hasQuery = Boolean(state.normalizedQuery);
+  const current = state.searchIndex >= 0 ? state.searchIndex + 1 : 0;
+
+  els.resultLine.textContent = hasQuery
+    ? t('searchPosition', { current: formatNumber(current), total: formatNumber(results.length) })
+    : (filtering ? t('visibleResults', { shown: formatNumber(visible.length), total: formatNumber(state.doc?.messages.length || 0) }) : t('searchResultsEmpty'));
+
+  const hasResults = hasQuery && results.length > 0;
   els.prevResultBtn.disabled = !hasResults;
   els.nextResultBtn.disabled = !hasResults;
 }
 
 function clearSearch(options = {}) {
   clearTimeout(searchTimer);
-  els.searchInput.value = '';
-  state.query = '';
-  state.searchIndex = -1;
+  resetSearchState();
   if (options.resetRole) {
     els.roleFilter.value = 'all';
     state.role = 'all';
@@ -1073,12 +1238,9 @@ function requestResetDocument() {
 function resetLoadedDocument() {
   activeObserver?.disconnect();
   state.doc = null;
-  state.query = '';
   state.role = 'all';
-  state.filteredIds = [];
-  state.searchIndex = -1;
   state.activeId = null;
-  els.searchInput.value = '';
+  resetSearchState();
   els.metaDetails.open = false;
   updateRoleFilter(null);
   render();
@@ -1087,14 +1249,16 @@ function resetLoadedDocument() {
 }
 
 function jumpSearchResult(direction) {
-  if (!(state.query || state.role !== 'all') || !state.filteredIds.length) return;
-  const current = state.searchIndex >= 0 ? state.searchIndex : (direction > 0 ? -1 : 0);
-  state.searchIndex = (current + direction + state.filteredIds.length) % state.filteredIds.length;
-  const id = state.filteredIds[state.searchIndex];
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setActiveMessage(id);
-  scrollMessageNavToId(id);
+  const results = visibleSearchResults();
+  if (!results.length) return;
+
+  state.searchIndex = nextSearchIndex(state.searchIndex, results.length, direction);
+  const result = results[state.searchIndex];
+  setCurrentSearchMark(result);
+  setActiveMessage(result.messageId);
+  scrollMessageNavToId(result.messageId);
   setDrawerOpen(false);
+  renderResultStatus(visibleMessages());
 }
 
 function scrollMessageNavToId(id) {
@@ -1112,7 +1276,7 @@ function scrollMessageNavToId(id) {
     ?.scrollIntoView({ block: 'nearest' });
 }
 
-function markdownToHtml(markdown, highlightTerm = '') {
+function markdownToHtml(markdown) {
   const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
   const html = [];
   const listStack = [];
@@ -1120,10 +1284,11 @@ function markdownToHtml(markdown, highlightTerm = '') {
   let inCode = false;
   let codeBuffer = [];
   let codeLanguage = '';
+  let codeFence = null;
 
   const closeParagraph = () => {
     if (!paragraph.length) return;
-    html.push(`<p>${inlineMarkdown(paragraph.join(' '), highlightTerm)}</p>`);
+    html.push(`<p>${inlineMarkdown(paragraph.join(' '))}</p>`);
     paragraph = [];
   };
 
@@ -1137,20 +1302,29 @@ function markdownToHtml(markdown, highlightTerm = '') {
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
-    const fence = line.match(/^```(.*)$/);
-    if (fence) {
+    const fence = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    const closesCodeFence = inCode
+      && fence
+      && fence[1][0] === codeFence.char
+      && fence[1].length >= codeFence.length
+      && !fence[2].trim();
+
+    if (!inCode && fence) {
       closeParagraph();
       closeAllLists();
-      if (inCode) {
-        const codeHtml = highlightHtml(escapeHtml(codeBuffer.join('\n')), highlightTerm);
-        html.push(`<pre><code${codeLanguage ? ` class="language-${escapeHtml(codeLanguage)}"` : ''}>${codeHtml}</code></pre>`);
-        inCode = false;
-        codeBuffer = [];
-        codeLanguage = '';
-      } else {
-        inCode = true;
-        codeLanguage = fence[1].trim().split(/\s+/)[0] || '';
-      }
+      inCode = true;
+      codeFence = { char: fence[1][0], length: fence[1].length };
+      codeLanguage = fence[2].trim().split(/\s+/)[0] || '';
+      continue;
+    }
+
+    if (closesCodeFence) {
+      const codeHtml = escapeHtml(codeBuffer.join('\n'));
+      html.push(`<pre><code${codeLanguage ? ` class="language-${escapeHtml(codeLanguage)}"` : ''}>${codeHtml}</code></pre>`);
+      inCode = false;
+      codeBuffer = [];
+      codeLanguage = '';
+      codeFence = null;
       continue;
     }
 
@@ -1177,7 +1351,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
       closeParagraph();
       closeAllLists();
       const level = Math.min(heading[1].length + 1, 6);
-      html.push(`<h${level}>${inlineMarkdown(heading[2].trim(), highlightTerm)}</h${level}>`);
+      html.push(`<h${level}>${inlineMarkdown(heading[2].trim())}</h${level}>`);
       continue;
     }
 
@@ -1185,7 +1359,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
     if (quote) {
       closeParagraph();
       closeAllLists();
-      html.push(`<blockquote>${inlineMarkdown(quote[1], highlightTerm)}</blockquote>`);
+      html.push(`<blockquote>${inlineMarkdown(quote[1])}</blockquote>`);
       continue;
     }
 
@@ -1202,7 +1376,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
         html.push(`<${type}>`);
         listStack.push({ indent, type });
       }
-      html.push(`<li>${inlineMarkdown(item[3], highlightTerm)}</li>`);
+      html.push(`<li>${inlineMarkdown(item[3])}</li>`);
       continue;
     }
 
@@ -1216,7 +1390,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
         index += 1;
       }
       index -= 1;
-      html.push(renderMarkdownTable(tableLines, highlightTerm));
+      html.push(renderMarkdownTable(tableLines));
       continue;
     }
 
@@ -1227,7 +1401,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
   closeParagraph();
   closeAllLists();
   if (inCode) {
-    html.push(`<pre><code>${highlightHtml(escapeHtml(codeBuffer.join('\n')), highlightTerm)}</code></pre>`);
+    html.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`);
   }
 
   return html.join('\n');
@@ -1250,17 +1424,17 @@ function splitTableRow(line) {
     .map((cell) => cell.trim());
 }
 
-function renderMarkdownTable(lines, highlightTerm) {
+function renderMarkdownTable(lines) {
   const headers = splitTableRow(lines[0]);
   const rows = lines.slice(1).map(splitTableRow);
-  const head = `<thead><tr>${headers.map((cell) => `<th>${inlineMarkdown(cell, highlightTerm)}</th>`).join('')}</tr></thead>`;
+  const head = `<thead><tr>${headers.map((cell) => `<th>${inlineMarkdown(cell)}</th>`).join('')}</tr></thead>`;
   const body = rows.length
-    ? `<tbody>${rows.map((row) => `<tr>${headers.map((_, index) => `<td>${inlineMarkdown(row[index] || '', highlightTerm)}</td>`).join('')}</tr>`).join('')}</tbody>`
+    ? `<tbody>${rows.map((row) => `<tr>${headers.map((_, index) => `<td>${inlineMarkdown(row[index] || '')}</td>`).join('')}</tr>`).join('')}</tbody>`
     : '';
   return `<table>${head}${body}</table>`;
 }
 
-function inlineMarkdown(text, highlightTerm) {
+function inlineMarkdown(text) {
   const codeParts = text.split(/(`[^`]*`)/g);
   return codeParts.map((part) => {
     if (part.startsWith('`') && part.endsWith('`')) {
@@ -1281,9 +1455,6 @@ function inlineMarkdown(text, highlightTerm) {
       .replace(/_([^_]+)_/g, '<em>$1</em>');
     output = escaped.restore(output);
 
-    if (highlightTerm.trim()) {
-      output = highlightEscapedText(output, highlightTerm.trim());
-    }
     return output;
   }).join('');
 }
@@ -1299,20 +1470,6 @@ function protectMarkdownEscapes(text) {
       return html.replace(/\uE000(\d+)\uE000/g, (match, index) => escapeHtml(values[Number(index)] || ''));
     }
   };
-}
-
-function highlightEscapedText(html, term) {
-  const safeTerm = escapeRegExp(escapeHtml(term));
-  if (!safeTerm) return html;
-  const regex = new RegExp(`(${safeTerm})`, 'gi');
-  return html.replace(/(<[^>]+>|[^<]+)/g, (segment) => {
-    if (segment.startsWith('<')) return segment;
-    return segment.replace(regex, '<mark>$1</mark>');
-  });
-}
-
-function highlightHtml(html, term) {
-  return term.trim() ? highlightEscapedText(html, term.trim()) : html;
 }
 
 function safeUrl(rawUrl) {
@@ -1332,10 +1489,6 @@ function unescapeHtml(value) {
   const textarea = document.createElement('textarea');
   textarea.innerHTML = value;
   return textarea.value;
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function formatNumber(value) {
