@@ -190,6 +190,10 @@ const I18N = {
   }
 };
 
+const { parseChatMarkdown } = globalThis.ChatLogParser;
+const { normalizeForSearch } = globalThis.ChatLogSearch;
+const { safeUrl: safeUrlForBase } = globalThis.ChatLogUrl;
+
 const els = {
   html: document.documentElement,
   body: document.body,
@@ -366,6 +370,7 @@ function init() {
   setDrawerOpen(false);
   setSidebarCollapsed(state.sidebarCollapsed);
   applyI18n();
+  updateRoleFilter(null);
   bindEvents();
   registerServiceWorker();
 }
@@ -639,7 +644,7 @@ async function loadFile(file) {
   try {
     const buffer = await file.arrayBuffer();
     const decoded = decodeBuffer(buffer, state.encoding);
-    const doc = parseChatMarkdown(decoded.text, file.name, decoded.encoding);
+    const doc = parseChatMarkdown(decoded.text, file.name, decoded.encoding, { untitledTitle: t('titleUntitled') });
     state.doc = doc;
     state.query = '';
     state.role = 'all';
@@ -677,7 +682,7 @@ async function loadUrl(input) {
     const buffer = await response.arrayBuffer();
     const decoded = decodeBuffer(buffer, state.encoding);
     const name = decodeURIComponent(url.pathname.split('/').pop() || 'remote.md');
-    state.doc = parseChatMarkdown(decoded.text, name, decoded.encoding);
+    state.doc = parseChatMarkdown(decoded.text, name, decoded.encoding, { untitledTitle: t('titleUntitled') });
     state.query = '';
     state.role = 'all';
     state.activeId = null;
@@ -719,130 +724,6 @@ function scoreDecodedText(text) {
 
 function countMatches(text, regex) {
   return (text.match(regex) || []).length;
-}
-
-function parseChatMarkdown(text, sourceName, encoding) {
-  const normalized = text.replace(/\r\n?/g, '\n');
-  const title = normalized.match(/^#\s+(.+)$/m)?.[1]?.trim() || sourceName || t('titleUntitled');
-  const markers = findMessageMarkers(normalized);
-  const head = markers.length ? normalized.slice(0, markers[0].index) : normalized;
-  const meta = parseMetadata(head);
-  const messages = [];
-  const participants = [];
-  const participantMap = new Map();
-  let turn = 0;
-
-  if (markers.length) {
-    markers.forEach((marker, index) => {
-      const speaker = marker[1].trim();
-      const role = normalizeRole(speaker);
-      const participantIndex = participantIndexFor(speaker, participants, participantMap);
-      if (participantIndex === 0) turn += 1;
-      const start = marker.index + marker[0].length;
-      const end = markers[index + 1]?.index ?? normalized.length;
-      const raw = normalized.slice(start, end).trim();
-      const plain = stripMarkdown(raw);
-      messages.push({
-        id: `message-${index + 1}`,
-        role,
-        speaker,
-        participantIndex,
-        isPrimarySpeaker: participantIndex === 0,
-        turn: turn || 1,
-        raw,
-        plain,
-        searchText: normalizeForSearch(plain),
-        navExcerpt: plain.slice(0, 180),
-        chars: Array.from(plain).length
-      });
-    });
-  } else {
-    const body = normalized.replace(/^#\s+.+$/m, '').trim();
-    if (body) {
-      const plain = stripMarkdown(body);
-      messages.push({
-        id: 'message-1',
-        role: 'response',
-        speaker: 'Response',
-        participantIndex: 0,
-        isPrimarySpeaker: true,
-        turn: 1,
-        raw: body,
-        plain,
-        searchText: normalizeForSearch(plain),
-        navExcerpt: plain.slice(0, 180),
-        chars: Array.from(plain).length
-      });
-    }
-  }
-
-  return {
-    title,
-    sourceName,
-    encoding,
-    meta,
-    participants,
-    messages,
-    turns: Math.max(...messages.map((message) => message.turn), 0),
-    chars: messages.reduce((total, message) => total + message.chars, 0),
-    parsedAsChat: markers.length > 0
-  };
-}
-
-function findMessageMarkers(text) {
-  const known = /^(Prompt|Response|User|Assistant|System|Developer|Tool|Function|Moderator|Narrator|Observer|Participant\s*\d+)$/i;
-  const knownMarkers = [...text.matchAll(/^##\s*([^:\n]{1,48}):\s*$/gmi)]
-    .filter((marker) => known.test(marker[1].trim()));
-  if (knownMarkers.length) return knownMarkers;
-  return [...text.matchAll(/^##\s*([^:\n]{1,48}):\s*$/gmi)];
-}
-
-function normalizeRole(speaker) {
-  const normalized = speaker.trim().toLowerCase();
-  if (normalized === 'prompt') return 'prompt';
-  if (normalized === 'response') return 'response';
-  return normalized.replace(/[^a-z0-9_-]+/g, '-') || 'participant';
-}
-
-function participantIndexFor(speaker, participants, participantMap) {
-  const key = speaker.trim().toLocaleLowerCase();
-  if (participantMap.has(key)) return participantMap.get(key);
-  const index = participants.length;
-  participantMap.set(key, index);
-  participants.push({ key, label: speaker.trim(), index });
-  return index;
-}
-
-function parseMetadata(head) {
-  const meta = {};
-  head.split('\n').forEach((line) => {
-    const match = line.match(/^\*\*(User|Created|Updated|Exported|Link):\*\*\s*(.*?)\s*$/i);
-    if (!match) return;
-    const key = match[1].toLowerCase();
-    let value = match[2].replace(/\s{2,}$/, '').trim();
-    if (key === 'link') {
-      const link = value.match(/\[([^\]]+)]\(([^)]+)\)/);
-      value = link ? link[2] : value;
-    }
-    meta[key] = value;
-  });
-  return meta;
-}
-
-function stripMarkdown(markdown) {
-  return markdown
-    .replace(/```[^\n]*\n([\s\S]*?)```/g, ' $1 ')
-    .replace(/```([^`]*)```/g, ' $1 ')
-    .replace(/`([^`]+)`/g, '$1')
-    .replace(/\[([^\]]+)]\(([^)]+)\)/g, '$1')
-    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
-    .replace(/^\s{0,3}>\s?/gm, '')
-    .replace(/^\s*[-*+]\s+/gm, '')
-    .replace(/^\s*\d+[.)]\s+/gm, '')
-    .replace(/[*_~]/g, '')
-    .replace(/\\([\\`*{}\[\]()#+\-.!_>~|])/g, '$1')
-    .replace(/\s+/g, ' ')
-    .trim();
 }
 
 function render() {
@@ -907,8 +788,7 @@ function updateRoleFilter(doc) {
   const selected = state.role;
   const options = [`<option value="all" data-i18n="all">${escapeHtml(t('all'))}</option>`];
   (doc?.participants || []).forEach((participant) => {
-    const role = normalizeRole(participant.label);
-    options.push(`<option value="${escapeHtml(role)}">${escapeHtml(participantLabel({ speaker: participant.label, role }))}</option>`);
+    options.push(`<option value="${escapeHtml(participant.id)}">${escapeHtml(participantLabel(participant))}</option>`);
   });
   els.roleFilter.innerHTML = options.join('');
   els.roleFilter.value = [...els.roleFilter.options].some((option) => option.value === selected) ? selected : 'all';
@@ -918,7 +798,7 @@ function updateRoleFilter(doc) {
 function filteredMessages() {
   const query = normalizeForSearch(state.query);
   return state.doc.messages.filter((message) => {
-    const roleMatches = state.role === 'all' || message.role === state.role;
+    const roleMatches = state.role === 'all' || message.speakerId === state.role;
     const queryMatches = !query || (message.searchText || normalizeForSearch(message.plain)).includes(query);
     return roleMatches && queryMatches;
   });
@@ -1062,7 +942,8 @@ function renderMessageNavWindow() {
 }
 
 function participantLabel(message) {
-  return I18N[state.lang][message.role] || message.speaker || message.role;
+  const role = message.semanticRole || message.role;
+  return I18N[state.lang][role] || message.speaker || message.label || role;
 }
 
 function observeVisibleMessages() {
@@ -1380,17 +1261,7 @@ function highlightHtml(html, term) {
 }
 
 function safeUrl(rawUrl) {
-  if (!rawUrl) return '';
-  try {
-    const cleaned = rawUrl.replace(/^['"]|['"]$/g, '');
-    if (cleaned.startsWith('#') || cleaned.startsWith('./') || cleaned.startsWith('../') || cleaned.startsWith('/')) {
-      return cleaned;
-    }
-    const url = new URL(cleaned, location.href);
-    return ['http:', 'https:', 'mailto:'].includes(url.protocol) ? url.href : '';
-  } catch {
-    return '';
-  }
+  return safeUrlForBase(rawUrl, location.href);
 }
 
 function escapeHtml(value) {
@@ -1410,10 +1281,6 @@ function unescapeHtml(value) {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function normalizeForSearch(value) {
-  return String(value).normalize('NFKC').toLocaleLowerCase();
 }
 
 function formatNumber(value) {

@@ -117,8 +117,6 @@
                 <span data-i18n="role">Role</span>
                 <select id="roleFilter">
                   <option value="all" data-i18n="all">All</option>
-                  <option value="prompt" data-i18n="prompt">Prompt</option>
-                  <option value="response" data-i18n="response">Response</option>
                 </select>
               </label>
               <button class="button button-quiet" id="clearSearchBtn" type="button" data-i18n-attr="aria-label:resetFilters;title:resetFilters">
@@ -289,6 +287,9 @@
       </div>
     </div>
   </dialog>
+  <script src="lib/search.js" defer></script>
+  <script src="lib/url.js" defer></script>
+  <script src="lib/parser.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>
