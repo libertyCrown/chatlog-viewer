@@ -48,6 +48,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  // Only the app shell is cached. Markdown loaded by URL remains outside this handler by design.
   if (!APP_SHELL_URLS.has(url.href)) return;
 
   event.respondWith(

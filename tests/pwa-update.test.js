@@ -5,9 +5,9 @@ const assert = require('node:assert/strict');
 const { shouldOfferUpdate, shouldReloadAfterUpdate } = require('../lib/pwa-update.js');
 const appVersion = require('../app-version.js');
 
-test('uses one development version for display and cache keys', () => {
-  assert.equal(appVersion.value, '2.0.0-dev');
-  assert.equal(appVersion.cacheKey, 'v2.0.0-dev');
+test('uses one release version for display and cache keys', () => {
+  assert.equal(appVersion.value, '2.0.0');
+  assert.equal(appVersion.cacheKey, 'v2.0.0');
 });
 
 test('offers an update only for a waiting worker that controls this page', () => {

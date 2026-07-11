@@ -287,6 +287,7 @@ const els = {
   updateLaterBtn: document.getElementById('updateLaterBtn')
 };
 
+// Rendering bookkeeping lets search and filters update existing cards instead of rebuilding the conversation.
 const state = {
   lang: initialLanguage(),
   theme: localStorage.getItem(STORAGE.theme) || 'system',
@@ -325,6 +326,7 @@ const NAV_ROW_HEIGHT = NAV_ITEM_HEIGHT + NAV_ITEM_GAP;
 const NAV_OVERSCAN = 8;
 const NAV_VIRTUAL_THRESHOLD = 120;
 const NAV_EXCERPT_LENGTH = 180;
+// The navigation list becomes windowed only when a long log benefits from virtualization.
 const navState = {
   messages: [],
   virtual: false,
@@ -613,6 +615,7 @@ function showAboutDialog() {
 }
 
 function showDialog(dialog, opener, initialFocus) {
+  // Native dialogs provide modality; keep a return target for a predictable keyboard path.
   if (typeof dialog.showModal !== 'function') return false;
   dialogReturnFocus.set(dialog, opener || document.activeElement);
   dialog.showModal();
@@ -635,6 +638,7 @@ function restoreDialogFocus(dialog) {
 }
 
 function showServiceWorkerUpdate(registration) {
+  // A waiting worker is an update only after this page is already controlled by a prior worker.
   if (!shouldOfferUpdate({
     hasWaitingWorker: Boolean(registration?.waiting),
     hasController: Boolean(navigator.serviceWorker?.controller),
@@ -734,6 +738,7 @@ function hasDraggedFiles(event) {
 }
 
 function canAcceptFileDrop(event) {
+  // Match the visible affordance: the empty state accepts only its own drop zone; an open log accepts anywhere.
   return hasDraggedFiles(event)
     && (state.doc
       ? event.currentTarget === window
@@ -897,6 +902,7 @@ async function loadUrl(input) {
 }
 
 function decodeBuffer(buffer, requested) {
+  // Auto detection favours readable Japanese text while heavily penalising actual decoding failures.
   const options = requested === 'auto' ? ['utf-8', 'shift_jis', 'euc-jp'] : [requested];
   const candidates = options.map((encoding) => {
     try {
@@ -941,6 +947,7 @@ function render() {
     return;
   }
 
+  // Rebuild cards only for a new document or language. Search and filters reuse cached card markup.
   const shouldRenderConversation = state.renderedDoc !== state.doc || state.renderedLanguage !== state.lang;
   els.emptyState.hidden = true;
   els.documentView.hidden = false;
@@ -1010,6 +1017,7 @@ function updateRoleFilter(doc) {
 }
 
 function prepareDocument(doc) {
+  // Markdown is converted once per load so search never pays the rendering cost again.
   doc.messages.forEach((message) => {
     message.html = markdownToHtml(message.raw);
   });
@@ -1111,6 +1119,7 @@ function applySearchHighlights(force = false) {
     ...state.matchingMessageIds
   ]);
 
+  // Restore cached HTML before marking matches so removed or changed queries cannot leave stale highlights behind.
   affectedIds.forEach((id) => {
     const message = state.doc.messageById.get(id);
     const body = document.getElementById(id)?.querySelector('.message-body');
@@ -1243,6 +1252,7 @@ function createMessageNavItem(message) {
 }
 
 function scheduleRenderMessageNavWindow() {
+  // Coalesce scroll work into one frame while the virtual navigation list catches up.
   if (!navState.virtual || navState.frame) return;
   navState.frame = requestAnimationFrame(() => {
     navState.frame = null;
@@ -1295,6 +1305,7 @@ function participantLabel(message) {
 }
 
 function observeVisibleMessages() {
+  // Message cards are stable across search and filter changes, so observers are recreated only with card DOM.
   activeObserver?.disconnect();
   if (!('IntersectionObserver' in window)) return;
   activeObserver = new IntersectionObserver((entries) => {
@@ -1430,6 +1441,7 @@ function scrollMessageNavToId(id) {
 }
 
 function markdownToHtml(markdown) {
+  // Keep rendering deliberately small and safe for local logs; raw Markdown HTML is never interpreted.
   const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
   const html = [];
   const listStack = [];
@@ -1677,6 +1689,7 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
   if (!['http:', 'https:'].includes(location.protocol)) return;
   window.addEventListener('load', () => {
+    // Fetch update metadata freshly, but leave a waiting worker inactive until the user accepts it.
     navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
       .then((registration) => {
         state.serviceWorkerRegistration = registration;
