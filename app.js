@@ -20,8 +20,15 @@ const I18N = {
     aboutLine1: 'A lightweight local viewer for',
     aboutLine2: 'reviewing chat logs saved',
     aboutLine3: 'as Markdown.',
+    appVersion: 'Version {version}',
     viewOnGitHub: 'View on GitHub',
+    updateAvailableTitle: 'A new version is ready',
+    updateAvailableBody: 'Updating closes the current log. The original Markdown file will not be changed or deleted.',
+    updateNow: 'Update',
+    updateLater: 'Later',
+    updateApplying: 'Updating...',
     openFile: 'Open Markdown',
+    chooseFile: 'Choose file',
     install: 'Install',
     language: 'Language',
     theme: 'Theme',
@@ -29,11 +36,9 @@ const I18N = {
     advancedSettings: 'Advanced settings',
     showSidebar: 'Show sidebar',
     hideSidebar: 'Collapse sidebar',
-    dropTitle: 'Drop Markdown',
-    dropOr: 'or',
-    chooseFile: 'choose a file',
+    dropFileHint: 'Drop a Markdown file here',
+    dropFileHere: 'Drop to open a Markdown file',
     encoding: 'Encoding',
-    density: 'Density',
     displayMode: 'Display',
     comfortable: 'Comfortable',
     compact: 'Compact',
@@ -46,8 +51,10 @@ const I18N = {
     ready: 'Ready',
     search: 'Search',
     searchResults: 'Search results: {shown}',
+    searchPosition: 'Search results: {current} / {total}',
     visibleResults: 'Showing: {shown} / {total}',
     searchResultsEmpty: 'Search results: 0',
+    showMatchesOnly: 'Show matching messages only',
     previousResult: 'Previous result',
     nextResult: 'Next result',
     role: 'Role',
@@ -60,22 +67,24 @@ const I18N = {
     tool: 'Tool',
     clear: 'Clear',
     resetFilters: 'Reset filters',
-    emptyTitle: 'Open a Markdown chat log',
-    emptyBody: 'Files stay in this browser.',
+    emptyTitle: 'Open a chat log',
+    emptyBody: 'Local files are processed in this browser.',
     emptyFormats: 'ChatGPT Markdown / plain Markdown',
-    openSource: 'Open source',
+    openSource: 'Open original link',
     showLogInfo: 'Show log info',
-    resetDocument: 'Reset loaded Markdown',
-    resetConfirmTitle: 'Reset the loaded Markdown?',
-    resetConfirmBody: 'The current log will close and the start screen will be shown. The original file will not be deleted.',
-    resetDocumentConfirm: 'Reset',
-    resetComplete: 'Loaded Markdown reset',
+    closeDocument: 'Close log',
+    closeConfirmTitle: 'Close this log?',
+    closeConfirmBody: 'The current log will close and the start screen will be shown. The original file will not be changed or deleted.',
+    closeDocumentConfirm: 'Close log',
+    closeComplete: 'Log closed',
     cancel: 'Cancel',
     close: 'Close',
     noMatches: 'No matches',
     menu: 'Menu',
     closeMenu: 'Close menu',
-    sidebarTitle: 'Library',
+    sidebarTitle: 'Navigation',
+    messageList: 'Messages',
+    conversation: 'Conversation',
     source: 'Source',
     user: 'User',
     created: 'Created',
@@ -86,6 +95,7 @@ const I18N = {
     turn: 'Turn {n}',
     copied: 'Copied',
     copy: 'Copy',
+    copyMessage: 'Copy {speaker}, {turn}',
     loadedFile: 'Loaded: {name}',
     loadedUrl: 'Loaded URL',
     decodeUsed: 'Encoding: {encoding}',
@@ -93,7 +103,7 @@ const I18N = {
     fetchFailed: 'Could not load that URL. Check CORS or serve the file over HTTP/HTTPS.',
     fileFailed: 'Could not open that file',
     noFile: 'No file selected',
-    unsupportedUrl: 'Use http, https, or a relative URL served over HTTP/HTTPS',
+    unsupportedUrl: 'Use an HTTP/HTTPS URL or a relative URL from this site',
     installReady: 'Install is available',
     installed: 'Installed',
     themeSystem: 'System',
@@ -107,8 +117,15 @@ const I18N = {
     aboutLine1: 'Markdown形式で保存された',
     aboutLine2: 'チャットログを読み返すための',
     aboutLine3: '軽量なローカルビューアです。',
+    appVersion: 'バージョン {version}',
     viewOnGitHub: 'GitHubで見る',
+    updateAvailableTitle: '新しいバージョンがあります',
+    updateAvailableBody: '更新すると、現在表示中のログは閉じます。元のMarkdownファイルは変更・削除されません。',
+    updateNow: '更新する',
+    updateLater: '後で',
+    updateApplying: '更新しています…',
     openFile: 'Markdownを開く',
+    chooseFile: 'ファイルを選択',
     install: 'インストール',
     language: '言語',
     theme: 'テーマ',
@@ -116,11 +133,9 @@ const I18N = {
     advancedSettings: '詳細設定',
     showSidebar: 'サイドバーを表示',
     hideSidebar: 'サイドバーを畳む',
-    dropTitle: 'Markdownをドロップ',
-    dropOr: 'または',
-    chooseFile: 'ファイル選択',
+    dropFileHint: 'Markdownファイルをここにドロップ',
+    dropFileHere: 'Markdownファイルをドロップして開く',
     encoding: '文字コード',
-    density: '表示方法',
     displayMode: '表示方法',
     comfortable: '標準',
     compact: 'コンパクト',
@@ -133,8 +148,10 @@ const I18N = {
     ready: '待機中',
     search: '検索',
     searchResults: '検索結果: {shown}件',
+    searchPosition: '検索結果: {current} / {total}',
     visibleResults: '表示中: {shown} / {total}',
     searchResultsEmpty: '検索結果: 0',
+    showMatchesOnly: '一致した発言だけ表示',
     previousResult: '前の検索結果',
     nextResult: '次の検索結果',
     role: '種類',
@@ -147,22 +164,24 @@ const I18N = {
     tool: 'Tool',
     clear: 'クリア',
     resetFilters: '検索条件をリセット',
-    emptyTitle: 'Markdown\u200Bチャットログを開く',
+    emptyTitle: 'チャットログを開く',
     emptyBody: 'ファイルはこのブラウザ内で\u200B処理されます。',
     emptyFormats: 'ChatGPT Markdown / 通常Markdown',
     openSource: '元リンクを開く',
     showLogInfo: 'ログ情報を表示',
-    resetDocument: '読み込みをリセット',
-    resetConfirmTitle: '読み込み中のMarkdownをリセットしますか？',
-    resetConfirmBody: '表示中のログを閉じて、最初の画面に戻ります。元のファイルは削除されません。',
-    resetDocumentConfirm: 'リセット',
-    resetComplete: '読み込みをリセットしました',
+    closeDocument: 'ログを閉じる',
+    closeConfirmTitle: 'このログを閉じますか？',
+    closeConfirmBody: '表示中のログを閉じて、最初の画面に戻ります。元のファイルは変更・削除されません。',
+    closeDocumentConfirm: 'ログを閉じる',
+    closeComplete: 'ログを閉じました',
     cancel: 'キャンセル',
     close: '閉じる',
     noMatches: '一致なし',
     menu: 'メニュー',
     closeMenu: 'メニューを閉じる',
-    sidebarTitle: 'ライブラリ',
+    sidebarTitle: 'ナビゲーション',
+    messageList: '発言一覧',
+    conversation: '会話本文',
     source: '読込元',
     user: 'ユーザー',
     created: '作成',
@@ -173,14 +192,15 @@ const I18N = {
     turn: '{n}往復目',
     copied: 'コピーしました',
     copy: 'コピー',
+    copyMessage: '{speaker}の{turn}をコピー',
     loadedFile: '読み込み完了: {name}',
     loadedUrl: 'URLを読み込みました',
     decodeUsed: '文字コード: {encoding}',
     parseFallback: '通常のMarkdownとして読み込みました',
-    fetchFailed: 'URLを読み込めませんでした。CORS制限、またはHTTP/HTTPS配信かを確認してください',
+    fetchFailed: 'URLを読み込めませんでした。CORS制限、またはHTTP/HTTPS配信かを確認してください。',
     fileFailed: 'ファイルを開けませんでした',
     noFile: 'ファイルが選択されていません',
-    unsupportedUrl: 'http、https、またはHTTP/HTTPS上の相対URLを指定してください',
+    unsupportedUrl: 'HTTP/HTTPSのURL、または同じサイト内の相対URLを指定してください。',
     installReady: 'インストールできます',
     installed: 'インストール済み',
     themeSystem: 'システム',
@@ -190,11 +210,26 @@ const I18N = {
   }
 };
 
+const { parseChatMarkdown } = globalThis.ChatLogParser;
+const {
+  collectSearchResults,
+  filterMessages,
+  findNormalizedMatches,
+  nextSearchIndex,
+  normalizeForSearch
+} = globalThis.ChatLogSearch;
+const { safeUrl: safeUrlForBase } = globalThis.ChatLogUrl;
+const APP_VERSION = globalThis.ChatLogViewerVersion;
+const { shouldOfferUpdate, shouldReloadAfterUpdate } = globalThis.ChatLogPwaUpdate;
+const { nextMessageNavIndex } = globalThis.ChatLogNavigation;
+
 const els = {
   html: document.documentElement,
   body: document.body,
+  topbar: document.getElementById('topbar'),
   aboutAppBtn: document.getElementById('aboutAppBtn'),
   aboutDialog: document.getElementById('aboutDialog'),
+  aboutVersion: document.getElementById('aboutVersion'),
   closeAboutDialogBtn: document.getElementById('closeAboutDialogBtn'),
   sidebarRail: document.getElementById('sidebarRail'),
   sidebar: document.getElementById('sidebar'),
@@ -207,11 +242,12 @@ const els = {
   sidebarScrim: document.getElementById('sidebarScrim'),
   railSearchBtn: document.getElementById('railSearchBtn'),
   openFileBtn: document.getElementById('openFileBtn'),
-  topResetDocumentBtn: document.getElementById('topResetDocumentBtn'),
+  topCloseDocumentBtn: document.getElementById('topCloseDocumentBtn'),
   installBtn: document.getElementById('installBtn'),
   drawerInstallBtn: document.getElementById('drawerInstallBtn'),
   fileInput: document.getElementById('fileInput'),
   emptyDropZone: document.getElementById('emptyDropZone'),
+  dropOverlay: document.getElementById('dropOverlay'),
   emptyOpenFileBtn: document.getElementById('emptyOpenFileBtn'),
   encodingSelect: document.getElementById('encodingSelect'),
   densitySelect: document.getElementById('densitySelect'),
@@ -226,15 +262,16 @@ const els = {
   nextResultBtn: document.getElementById('nextResultBtn'),
   roleFilter: document.getElementById('roleFilter'),
   clearSearchBtn: document.getElementById('clearSearchBtn'),
+  matchOnlyToggle: document.getElementById('matchOnlyToggle'),
   messageList: document.getElementById('messageList'),
   emptyState: document.getElementById('emptyState'),
   documentView: document.getElementById('documentView'),
   sourceLabel: document.getElementById('sourceLabel'),
   docTitle: document.getElementById('docTitle'),
   sourceLink: document.getElementById('sourceLink'),
-  resetDocumentDialog: document.getElementById('resetDocumentDialog'),
-  cancelResetDocumentBtn: document.getElementById('cancelResetDocumentBtn'),
-  confirmResetDocumentBtn: document.getElementById('confirmResetDocumentBtn'),
+  closeDocumentDialog: document.getElementById('closeDocumentDialog'),
+  cancelCloseDocumentBtn: document.getElementById('cancelCloseDocumentBtn'),
+  confirmCloseDocumentBtn: document.getElementById('confirmCloseDocumentBtn'),
   metaDetails: document.getElementById('metaDetails'),
   metaGrid: document.getElementById('metaGrid'),
   conversation: document.getElementById('conversation'),
@@ -244,9 +281,13 @@ const els = {
   statTurns: document.getElementById('statTurns'),
   statChars: document.getElementById('statChars'),
   statusLine: document.getElementById('statusLine'),
-  toast: document.getElementById('toast')
+  toast: document.getElementById('toast'),
+  updateNotice: document.getElementById('updateNotice'),
+  updateNowBtn: document.getElementById('updateNowBtn'),
+  updateLaterBtn: document.getElementById('updateLaterBtn')
 };
 
+// Rendering bookkeeping lets search and filters update existing cards instead of rebuilding the conversation.
 const state = {
   lang: initialLanguage(),
   theme: localStorage.getItem(STORAGE.theme) || 'system',
@@ -254,22 +295,38 @@ const state = {
   encoding: localStorage.getItem(STORAGE.encoding) || 'auto',
   doc: null,
   query: '',
+  normalizedQuery: '',
   role: 'all',
-  filteredIds: [],
+  searchResults: [],
+  matchingMessageIds: new Set(),
+  showMatchesOnly: false,
   searchIndex: -1,
   deferredInstallPrompt: null,
   activeId: null,
   sidebarCollapsed: localStorage.getItem(STORAGE.sidebarCollapsed) === 'true',
-  drawerOpen: false
+  drawerOpen: false,
+  serviceWorkerRegistration: null,
+  updateNoticeDismissed: false,
+  updateAccepted: false,
+  updateReloadStarted: false,
+  renderedDoc: null,
+  renderedLanguage: null,
+  renderedNavKey: '',
+  renderedVisibilityKey: '',
+  highlightedQuery: '',
+  highlightedMessageIds: new Set()
 };
 
 let searchTimer = null;
 let activeObserver = null;
+let fileDragDepth = 0;
 const NAV_ITEM_HEIGHT = 88;
 const NAV_ITEM_GAP = 8;
 const NAV_ROW_HEIGHT = NAV_ITEM_HEIGHT + NAV_ITEM_GAP;
 const NAV_OVERSCAN = 8;
 const NAV_VIRTUAL_THRESHOLD = 120;
+const NAV_EXCERPT_LENGTH = 180;
+// The navigation list becomes windowed only when a long log benefits from virtualization.
 const navState = {
   messages: [],
   virtual: false,
@@ -277,6 +334,11 @@ const navState = {
   end: -1,
   frame: null
 };
+
+const dialogReturnFocus = new Map();
+const DRAWER_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+let numberFormatter = null;
+let numberFormatterLanguage = '';
 
 function initialLanguage() {
   const stored = localStorage.getItem(STORAGE.language);
@@ -318,6 +380,7 @@ function applyI18n() {
     button.title = t('themeDark');
     button.setAttribute('aria-label', t('themeDark'));
   });
+  els.aboutVersion.textContent = t('appVersion', { version: APP_VERSION.value });
   if (!state.doc) setStatus(t('ready'));
   if (state.doc) updateRoleFilter(state.doc);
   render();
@@ -336,7 +399,9 @@ function populateLanguageOptions() {
 function applyTheme() {
   els.html.dataset.theme = state.theme;
   document.querySelectorAll('[data-theme-choice]').forEach((button) => {
-    button.classList.toggle('is-active', button.dataset.themeChoice === state.theme);
+    const selected = button.dataset.themeChoice === state.theme;
+    button.classList.toggle('is-active', selected);
+    button.setAttribute('aria-pressed', String(selected));
   });
 }
 
@@ -365,7 +430,9 @@ function init() {
   applyDensity();
   setDrawerOpen(false);
   setSidebarCollapsed(state.sidebarCollapsed);
+  resetSearchState();
   applyI18n();
+  updateRoleFilter(null);
   bindEvents();
   registerServiceWorker();
 }
@@ -373,10 +440,10 @@ function init() {
 function bindEvents() {
   els.aboutAppBtn.addEventListener('click', showAboutDialog);
   els.closeAboutDialogBtn.addEventListener('click', () => {
-    els.aboutDialog.close();
+    closeDialog(els.aboutDialog);
   });
   els.aboutDialog.addEventListener('click', (event) => {
-    if (event.target === els.aboutDialog) els.aboutDialog.close();
+    if (event.target === els.aboutDialog) closeDialog(els.aboutDialog);
   });
 
   els.sidebarToggleBtn.addEventListener('click', () => setDrawerOpen(!state.drawerOpen));
@@ -390,12 +457,8 @@ function bindEvents() {
     requestAnimationFrame(() => els.searchInput.focus());
   });
   window.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab' && state.drawerOpen && trapDrawerFocus(event)) return;
     if (event.key === 'Escape' && state.drawerOpen) setDrawerOpen(false);
-    if (event.key === '/' && !isTypingTarget(event.target)) {
-      event.preventDefault();
-      setSidebarCollapsed(false);
-      els.searchInput.focus();
-    }
     if (event.key === 'Enter' && document.activeElement === els.searchInput) {
       event.preventDefault();
       clearTimeout(searchTimer);
@@ -403,6 +466,7 @@ function bindEvents() {
       if (state.query !== nextQuery) {
         state.query = nextQuery;
         state.searchIndex = -1;
+        updateSearchResults();
         render();
       }
       jumpSearchResult(event.shiftKey ? -1 : 1);
@@ -416,7 +480,7 @@ function bindEvents() {
   els.sidebarContent.addEventListener('scroll', scheduleRenderMessageNavWindow, { passive: true });
 
   els.openFileBtn.addEventListener('click', openFile);
-  els.topResetDocumentBtn.addEventListener('click', requestResetDocument);
+  els.topCloseDocumentBtn.addEventListener('click', requestCloseDocument);
   els.emptyOpenFileBtn.addEventListener('click', openFile);
   els.fileInput.addEventListener('change', () => {
     const [file] = els.fileInput.files || [];
@@ -424,27 +488,15 @@ function bindEvents() {
     else setStatus(t('noFile'));
     els.fileInput.value = '';
   });
-
-  [els.emptyDropZone].forEach((zone) => {
-    ['dragenter', 'dragover'].forEach((eventName) => {
-      zone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        zone.classList.add('is-dragging');
-      });
-    });
-
-    ['dragleave', 'drop'].forEach((eventName) => {
-      zone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        zone.classList.remove('is-dragging');
-      });
-    });
-
-    zone.addEventListener('drop', (event) => {
-      const [file] = event.dataTransfer.files || [];
-      if (file) loadFile(file);
-    });
-  });
+  window.addEventListener('dragenter', handleFileDragEnter);
+  window.addEventListener('dragover', handleFileDragOver);
+  window.addEventListener('dragleave', handleFileDragLeave);
+  window.addEventListener('drop', handleFileDrop);
+  window.addEventListener('dragend', resetFileDragState);
+  els.emptyDropZone.addEventListener('dragenter', handleFileDragEnter);
+  els.emptyDropZone.addEventListener('dragover', handleFileDragOver);
+  els.emptyDropZone.addEventListener('dragleave', handleFileDragLeave);
+  els.emptyDropZone.addEventListener('drop', handleFileDrop);
 
   els.encodingSelect.addEventListener('change', () => {
     state.encoding = els.encodingSelect.value;
@@ -483,6 +535,7 @@ function bindEvents() {
     searchTimer = setTimeout(() => {
       state.query = els.searchInput.value.trim();
       state.searchIndex = -1;
+      updateSearchResults();
       render();
     }, 150);
   });
@@ -496,6 +549,12 @@ function bindEvents() {
     render();
   });
 
+  els.matchOnlyToggle.addEventListener('change', () => {
+    state.showMatchesOnly = els.matchOnlyToggle.checked;
+    state.searchIndex = -1;
+    render();
+  });
+
   els.clearSearchBtn.addEventListener('click', () => {
     clearSearch({ resetRole: true });
   });
@@ -504,9 +563,11 @@ function bindEvents() {
     const button = event.target.closest('[data-message-id]');
     if (!button) return;
     const target = document.getElementById(button.dataset.messageId);
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (target) target.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+    setActiveMessage(button.dataset.messageId);
     setDrawerOpen(false);
   });
+  els.messageList.addEventListener('keydown', handleMessageListKeydown);
 
   els.conversation.addEventListener('click', (event) => {
     const button = event.target.closest('[data-copy-id]');
@@ -515,15 +576,18 @@ function bindEvents() {
     if (message) copyText(message.raw);
   });
 
-  els.cancelResetDocumentBtn.addEventListener('click', () => {
-    els.resetDocumentDialog.close();
+  els.cancelCloseDocumentBtn.addEventListener('click', () => {
+    closeDialog(els.closeDocumentDialog);
   });
-  els.confirmResetDocumentBtn.addEventListener('click', () => {
-    els.resetDocumentDialog.close();
-    resetLoadedDocument();
+  els.confirmCloseDocumentBtn.addEventListener('click', () => {
+    closeLoadedDocument();
+    closeDialog(els.closeDocumentDialog, els.emptyOpenFileBtn);
   });
-  els.resetDocumentDialog.addEventListener('click', (event) => {
-    if (event.target === els.resetDocumentDialog) els.resetDocumentDialog.close();
+  els.closeDocumentDialog.addEventListener('click', (event) => {
+    if (event.target === els.closeDocumentDialog) closeDialog(els.closeDocumentDialog);
+  });
+  [els.aboutDialog, els.closeDocumentDialog].forEach((dialog) => {
+    dialog.addEventListener('close', () => restoreDialogFocus(dialog));
   });
 
   window.addEventListener('beforeinstallprompt', (event) => {
@@ -536,6 +600,8 @@ function bindEvents() {
 
   els.installBtn.addEventListener('click', promptInstall);
   els.drawerInstallBtn.addEventListener('click', promptInstall);
+  els.updateNowBtn.addEventListener('click', acceptServiceWorkerUpdate);
+  els.updateLaterBtn.addEventListener('click', dismissServiceWorkerUpdate);
 
   window.addEventListener('appinstalled', () => {
     els.installBtn.hidden = true;
@@ -545,9 +611,61 @@ function bindEvents() {
 }
 
 function showAboutDialog() {
-  if (typeof els.aboutDialog.showModal === 'function') {
-    els.aboutDialog.showModal();
-  }
+  showDialog(els.aboutDialog, els.aboutAppBtn, els.closeAboutDialogBtn);
+}
+
+function showDialog(dialog, opener, initialFocus) {
+  // Native dialogs provide modality; keep a return target for a predictable keyboard path.
+  if (typeof dialog.showModal !== 'function') return false;
+  dialogReturnFocus.set(dialog, opener || document.activeElement);
+  dialog.showModal();
+  requestAnimationFrame(() => {
+    if (dialog.open && initialFocus?.isConnected) initialFocus.focus({ preventScroll: true });
+  });
+  return true;
+}
+
+function closeDialog(dialog, returnFocus) {
+  if (!dialog.open) return;
+  if (returnFocus) dialogReturnFocus.set(dialog, returnFocus);
+  dialog.close();
+}
+
+function restoreDialogFocus(dialog) {
+  const target = dialogReturnFocus.get(dialog);
+  dialogReturnFocus.delete(dialog);
+  if (target?.isConnected && !target.hidden) target.focus({ preventScroll: true });
+}
+
+function showServiceWorkerUpdate(registration) {
+  // A waiting worker is an update only after this page is already controlled by a prior worker.
+  if (!shouldOfferUpdate({
+    hasWaitingWorker: Boolean(registration?.waiting),
+    hasController: Boolean(navigator.serviceWorker?.controller),
+    dismissed: state.updateNoticeDismissed
+  })) return;
+
+  state.serviceWorkerRegistration = registration;
+  els.updateNowBtn.disabled = false;
+  els.updateLaterBtn.disabled = false;
+  els.updateNotice.hidden = false;
+  setStatus(t('updateAvailableTitle'));
+}
+
+function dismissServiceWorkerUpdate() {
+  state.updateNoticeDismissed = true;
+  els.updateNotice.hidden = true;
+}
+
+function acceptServiceWorkerUpdate() {
+  const waitingWorker = state.serviceWorkerRegistration?.waiting;
+  if (!waitingWorker) return;
+
+  state.updateAccepted = true;
+  els.updateNowBtn.disabled = true;
+  els.updateLaterBtn.disabled = true;
+  setStatus(t('updateApplying'));
+  waitingWorker.postMessage({ type: 'SKIP_WAITING' });
 }
 
 async function promptInstall() {
@@ -572,6 +690,7 @@ function setDrawerOpen(open) {
   if ('inert' in els.sidebar) {
     els.sidebar.inert = drawerMode && !open;
   }
+  setDrawerBackgroundInert(open && drawerMode);
 
   if (open) {
     els.sidebarCloseBtn.focus({ preventScroll: true });
@@ -579,6 +698,98 @@ function setDrawerOpen(open) {
   } else if (document.activeElement && els.sidebar.contains(document.activeElement)) {
     els.sidebarToggleBtn.focus({ preventScroll: true });
   }
+}
+
+function setDrawerBackgroundInert(inert) {
+  [els.topbar, els.reader].forEach((element) => {
+    element.setAttribute('aria-hidden', String(inert));
+    if ('inert' in element) element.inert = inert;
+  });
+}
+
+function trapDrawerFocus(event) {
+  const focusable = [...els.sidebar.querySelectorAll(DRAWER_FOCUSABLE_SELECTOR)]
+    .filter((element) => !element.hidden && element.getClientRects().length);
+  if (!focusable.length) return false;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const current = document.activeElement;
+  if (event.shiftKey && (current === first || !els.sidebar.contains(current))) {
+    event.preventDefault();
+    last.focus();
+    return true;
+  }
+  if (!event.shiftKey && (current === last || !els.sidebar.contains(current))) {
+    event.preventDefault();
+    first.focus();
+    return true;
+  }
+  return false;
+}
+
+function scrollBehavior() {
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+}
+
+function hasDraggedFiles(event) {
+  return !document.querySelector('dialog[open]')
+    && Array.from(event.dataTransfer?.types || []).includes('Files');
+}
+
+function canAcceptFileDrop(event) {
+  // Match the visible affordance: the empty state accepts only its own drop zone; an open log accepts anywhere.
+  return hasDraggedFiles(event)
+    && (state.doc
+      ? event.currentTarget === window
+      : event.currentTarget === els.emptyDropZone);
+}
+
+function setFileDragActive(active) {
+  const isDocumentDrop = active && Boolean(state.doc);
+  els.dropOverlay.hidden = !isDocumentDrop;
+  els.emptyDropZone.classList.toggle('is-dragging', active && !state.doc);
+}
+
+function handleFileDragEnter(event) {
+  if (!canAcceptFileDrop(event)) return;
+  event.preventDefault();
+  if (state.doc) fileDragDepth += 1;
+  setFileDragActive(true);
+}
+
+function handleFileDragOver(event) {
+  if (!canAcceptFileDrop(event)) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'copy';
+}
+
+function handleFileDragLeave(event) {
+  if (state.doc) {
+    if (!fileDragDepth) return;
+    event.preventDefault();
+    fileDragDepth = Math.max(0, fileDragDepth - 1);
+    if (!fileDragDepth) setFileDragActive(false);
+    return;
+  }
+
+  if (event.currentTarget !== els.emptyDropZone) return;
+  event.preventDefault();
+  if (event.relatedTarget && els.emptyDropZone.contains(event.relatedTarget)) return;
+  setFileDragActive(false);
+}
+
+function handleFileDrop(event) {
+  if (!canAcceptFileDrop(event)) return;
+  const [file] = event.dataTransfer?.files || [];
+  event.preventDefault();
+  resetFileDragState();
+  if (file) loadFile(file);
+}
+
+function resetFileDragState() {
+  fileDragDepth = 0;
+  setFileDragActive(false);
 }
 
 function setSidebarCollapsed(collapsed) {
@@ -607,13 +818,6 @@ function isDrawerMode() {
   return window.matchMedia('(max-width: 860px)').matches;
 }
 
-function isTypingTarget(target) {
-  return target instanceof HTMLInputElement
-    || target instanceof HTMLTextAreaElement
-    || target instanceof HTMLSelectElement
-    || target?.isContentEditable;
-}
-
 async function openFile() {
   if ('showOpenFilePicker' in window && window.isSecureContext) {
     try {
@@ -639,13 +843,14 @@ async function loadFile(file) {
   try {
     const buffer = await file.arrayBuffer();
     const decoded = decodeBuffer(buffer, state.encoding);
-    const doc = parseChatMarkdown(decoded.text, file.name, decoded.encoding);
+    const doc = parseChatMarkdown(decoded.text, file.name, decoded.encoding, { untitledTitle: t('titleUntitled') });
+    prepareDocument(doc);
     state.doc = doc;
-    state.query = '';
     state.role = 'all';
     state.activeId = null;
-    state.searchIndex = -1;
-    els.searchInput.value = '';
+    state.renderedDoc = null;
+    state.renderedNavKey = '';
+    resetSearchState();
     updateRoleFilter(doc);
     render();
     setDrawerOpen(false);
@@ -677,12 +882,14 @@ async function loadUrl(input) {
     const buffer = await response.arrayBuffer();
     const decoded = decodeBuffer(buffer, state.encoding);
     const name = decodeURIComponent(url.pathname.split('/').pop() || 'remote.md');
-    state.doc = parseChatMarkdown(decoded.text, name, decoded.encoding);
-    state.query = '';
+    const doc = parseChatMarkdown(decoded.text, name, decoded.encoding, { untitledTitle: t('titleUntitled') });
+    prepareDocument(doc);
+    state.doc = doc;
     state.role = 'all';
     state.activeId = null;
-    state.searchIndex = -1;
-    els.searchInput.value = '';
+    state.renderedDoc = null;
+    state.renderedNavKey = '';
+    resetSearchState();
     updateRoleFilter(state.doc);
     render();
     setDrawerOpen(false);
@@ -695,6 +902,7 @@ async function loadUrl(input) {
 }
 
 function decodeBuffer(buffer, requested) {
+  // Auto detection favours readable Japanese text while heavily penalising actual decoding failures.
   const options = requested === 'auto' ? ['utf-8', 'shift_jis', 'euc-jp'] : [requested];
   const candidates = options.map((encoding) => {
     try {
@@ -721,157 +929,51 @@ function countMatches(text, regex) {
   return (text.match(regex) || []).length;
 }
 
-function parseChatMarkdown(text, sourceName, encoding) {
-  const normalized = text.replace(/\r\n?/g, '\n');
-  const title = normalized.match(/^#\s+(.+)$/m)?.[1]?.trim() || sourceName || t('titleUntitled');
-  const markers = findMessageMarkers(normalized);
-  const head = markers.length ? normalized.slice(0, markers[0].index) : normalized;
-  const meta = parseMetadata(head);
-  const messages = [];
-  const participants = [];
-  const participantMap = new Map();
-  let turn = 0;
-
-  if (markers.length) {
-    markers.forEach((marker, index) => {
-      const speaker = marker[1].trim();
-      const role = normalizeRole(speaker);
-      const participantIndex = participantIndexFor(speaker, participants, participantMap);
-      if (participantIndex === 0) turn += 1;
-      const start = marker.index + marker[0].length;
-      const end = markers[index + 1]?.index ?? normalized.length;
-      const raw = normalized.slice(start, end).trim();
-      const plain = stripMarkdown(raw);
-      messages.push({
-        id: `message-${index + 1}`,
-        role,
-        speaker,
-        participantIndex,
-        isPrimarySpeaker: participantIndex === 0,
-        turn: turn || 1,
-        raw,
-        plain,
-        searchText: normalizeForSearch(plain),
-        navExcerpt: plain.slice(0, 180),
-        chars: Array.from(plain).length
-      });
-    });
-  } else {
-    const body = normalized.replace(/^#\s+.+$/m, '').trim();
-    if (body) {
-      const plain = stripMarkdown(body);
-      messages.push({
-        id: 'message-1',
-        role: 'response',
-        speaker: 'Response',
-        participantIndex: 0,
-        isPrimarySpeaker: true,
-        turn: 1,
-        raw: body,
-        plain,
-        searchText: normalizeForSearch(plain),
-        navExcerpt: plain.slice(0, 180),
-        chars: Array.from(plain).length
-      });
-    }
-  }
-
-  return {
-    title,
-    sourceName,
-    encoding,
-    meta,
-    participants,
-    messages,
-    turns: Math.max(...messages.map((message) => message.turn), 0),
-    chars: messages.reduce((total, message) => total + message.chars, 0),
-    parsedAsChat: markers.length > 0
-  };
-}
-
-function findMessageMarkers(text) {
-  const known = /^(Prompt|Response|User|Assistant|System|Developer|Tool|Function|Moderator|Narrator|Observer|Participant\s*\d+)$/i;
-  const knownMarkers = [...text.matchAll(/^##\s*([^:\n]{1,48}):\s*$/gmi)]
-    .filter((marker) => known.test(marker[1].trim()));
-  if (knownMarkers.length) return knownMarkers;
-  return [...text.matchAll(/^##\s*([^:\n]{1,48}):\s*$/gmi)];
-}
-
-function normalizeRole(speaker) {
-  const normalized = speaker.trim().toLowerCase();
-  if (normalized === 'prompt') return 'prompt';
-  if (normalized === 'response') return 'response';
-  return normalized.replace(/[^a-z0-9_-]+/g, '-') || 'participant';
-}
-
-function participantIndexFor(speaker, participants, participantMap) {
-  const key = speaker.trim().toLocaleLowerCase();
-  if (participantMap.has(key)) return participantMap.get(key);
-  const index = participants.length;
-  participantMap.set(key, index);
-  participants.push({ key, label: speaker.trim(), index });
-  return index;
-}
-
-function parseMetadata(head) {
-  const meta = {};
-  head.split('\n').forEach((line) => {
-    const match = line.match(/^\*\*(User|Created|Updated|Exported|Link):\*\*\s*(.*?)\s*$/i);
-    if (!match) return;
-    const key = match[1].toLowerCase();
-    let value = match[2].replace(/\s{2,}$/, '').trim();
-    if (key === 'link') {
-      const link = value.match(/\[([^\]]+)]\(([^)]+)\)/);
-      value = link ? link[2] : value;
-    }
-    meta[key] = value;
-  });
-  return meta;
-}
-
-function stripMarkdown(markdown) {
-  return markdown
-    .replace(/```[^\n]*\n([\s\S]*?)```/g, ' $1 ')
-    .replace(/```([^`]*)```/g, ' $1 ')
-    .replace(/`([^`]+)`/g, '$1')
-    .replace(/\[([^\]]+)]\(([^)]+)\)/g, '$1')
-    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
-    .replace(/^\s{0,3}>\s?/gm, '')
-    .replace(/^\s*[-*+]\s+/gm, '')
-    .replace(/^\s*\d+[.)]\s+/gm, '')
-    .replace(/[*_~]/g, '')
-    .replace(/\\([\\`*{}\[\]()#+\-.!_>~|])/g, '$1')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 function render() {
   if (!state.doc) {
     activeObserver?.disconnect();
     els.emptyState.hidden = false;
     els.documentView.hidden = true;
-    els.topResetDocumentBtn.hidden = true;
-    state.filteredIds = [];
+    els.topCloseDocumentBtn.hidden = true;
+    state.renderedDoc = null;
+    state.renderedLanguage = null;
+    state.renderedNavKey = '';
+    state.renderedVisibilityKey = '';
+    state.highlightedMessageIds = new Set();
+    state.highlightedQuery = '';
     renderStats(null);
     renderResultStatus([]);
     resetMessageNav();
     return;
   }
 
-  const filtered = filteredMessages();
-  state.filteredIds = filtered.map((message) => message.id);
+  // Rebuild cards only for a new document or language. Search and filters reuse cached card markup.
+  const shouldRenderConversation = state.renderedDoc !== state.doc || state.renderedLanguage !== state.lang;
   els.emptyState.hidden = true;
   els.documentView.hidden = false;
-  els.topResetDocumentBtn.hidden = false;
-  els.docTitle.textContent = state.doc.title;
-  els.sourceLabel.textContent = `${state.doc.sourceName} / ${state.doc.encoding}`;
-  renderSourceLink();
-  renderMeta();
-  renderConversation(filtered);
-  renderMessageNav(filtered);
+  els.topCloseDocumentBtn.hidden = false;
+
+  if (shouldRenderConversation) {
+    els.docTitle.textContent = state.doc.title;
+    els.sourceLabel.textContent = `${state.doc.sourceName} / ${state.doc.encoding}`;
+    renderSourceLink();
+    renderMeta();
+    renderConversation(state.doc.messages);
+    state.renderedDoc = state.doc;
+    state.renderedLanguage = state.lang;
+    state.renderedNavKey = '';
+    state.renderedVisibilityKey = '';
+    state.highlightedMessageIds = new Set();
+    state.highlightedQuery = '';
+  }
+
+  const visible = visibleMessages();
+  applyMessageVisibility(visible, shouldRenderConversation);
+  applySearchHighlights(shouldRenderConversation);
+  renderMessageNavIfNeeded(visible);
   renderStats(state.doc);
-  renderResultStatus(filtered);
-  els.emptyResults.hidden = filtered.length !== 0;
+  renderResultStatus(visible);
+  els.emptyResults.hidden = visible.length !== 0;
 }
 
 function renderSourceLink() {
@@ -907,27 +1009,85 @@ function updateRoleFilter(doc) {
   const selected = state.role;
   const options = [`<option value="all" data-i18n="all">${escapeHtml(t('all'))}</option>`];
   (doc?.participants || []).forEach((participant) => {
-    const role = normalizeRole(participant.label);
-    options.push(`<option value="${escapeHtml(role)}">${escapeHtml(participantLabel({ speaker: participant.label, role }))}</option>`);
+    options.push(`<option value="${escapeHtml(participant.id)}">${escapeHtml(participantLabel(participant))}</option>`);
   });
   els.roleFilter.innerHTML = options.join('');
   els.roleFilter.value = [...els.roleFilter.options].some((option) => option.value === selected) ? selected : 'all';
   state.role = els.roleFilter.value;
 }
 
-function filteredMessages() {
-  const query = normalizeForSearch(state.query);
-  return state.doc.messages.filter((message) => {
-    const roleMatches = state.role === 'all' || message.role === state.role;
-    const queryMatches = !query || (message.searchText || normalizeForSearch(message.plain)).includes(query);
-    return roleMatches && queryMatches;
+function prepareDocument(doc) {
+  // Markdown is converted once per load so search never pays the rendering cost again.
+  doc.messages.forEach((message) => {
+    message.html = markdownToHtml(message.raw);
+  });
+  doc.messageById = new Map(doc.messages.map((message) => [message.id, message]));
+}
+
+function resetSearchState() {
+  state.query = '';
+  state.normalizedQuery = '';
+  state.searchResults = [];
+  state.matchingMessageIds = new Set();
+  state.showMatchesOnly = false;
+  state.searchIndex = -1;
+  state.highlightedQuery = '';
+  state.highlightedMessageIds = new Set();
+  els.searchInput.value = '';
+  els.matchOnlyToggle.checked = false;
+  els.matchOnlyToggle.disabled = true;
+}
+
+function updateSearchResults() {
+  state.normalizedQuery = normalizeForSearch(state.query);
+  state.searchResults = state.doc && state.normalizedQuery
+    ? collectSearchResults(state.doc.messages, state.query)
+    : [];
+  state.matchingMessageIds = new Set(state.searchResults.map((result) => result.messageId));
+
+  if (!state.normalizedQuery) state.showMatchesOnly = false;
+  els.matchOnlyToggle.checked = state.showMatchesOnly;
+  els.matchOnlyToggle.disabled = !state.normalizedQuery;
+}
+
+function visibleMessages() {
+  return filterMessages(state.doc.messages, {
+    speakerId: state.role,
+    matchOnly: state.showMatchesOnly && Boolean(state.normalizedQuery),
+    matchingMessageIds: state.matchingMessageIds
   });
 }
 
+function visibleSearchResults() {
+  return state.searchResults.filter((result) => state.role === 'all' || result.speakerId === state.role);
+}
+
+function applyMessageVisibility(messages, force = false) {
+  const key = `${state.role}\u0000${state.showMatchesOnly ? state.normalizedQuery : ''}`;
+  if (!force && key === state.renderedVisibilityKey) return;
+
+  const visibleIds = new Set(messages.map((message) => message.id));
+  els.conversation.querySelectorAll('.message-card').forEach((card) => {
+    card.hidden = !visibleIds.has(card.id);
+  });
+  state.renderedVisibilityKey = key;
+}
+
+function renderMessageNavIfNeeded(messages) {
+  const key = `${state.role}\u0000${state.showMatchesOnly ? state.normalizedQuery : ''}`;
+  if (key === state.renderedNavKey) {
+    updateActiveNavItem();
+    return;
+  }
+  state.renderedNavKey = key;
+  renderMessageNav(messages);
+}
+
 function renderConversation(messages) {
-  const query = state.query;
   els.conversation.innerHTML = messages.map((message) => {
     const roleLabel = participantLabel(message);
+    const turnLabel = t('turn', { n: message.turn });
+    const copyLabel = t('copyMessage', { speaker: roleLabel, turn: turnLabel });
     const speakerClass = `speaker-${message.participantIndex % 20}`;
     const primaryClass = message.isPrimarySpeaker ? 'speaker-primary' : 'speaker-secondary';
     return `
@@ -935,20 +1095,96 @@ function renderConversation(messages) {
         <header class="message-head">
           <div class="message-title">
             <span class="role-chip ${message.role} ${speakerClass}">${escapeHtml(roleLabel)}</span>
-            <span class="turn-label">${escapeHtml(t('turn', { n: message.turn }))}</span>
+            <span class="turn-label">${escapeHtml(turnLabel)}</span>
           </div>
           <div class="message-tools">
             <span class="turn-label">${escapeHtml(t('countLabel', { n: formatNumber(message.chars) }))}</span>
-            <button class="mini-button" type="button" data-copy-id="${message.id}" title="${escapeHtml(t('copy'))}" aria-label="${escapeHtml(t('copy'))}">
+            <button class="mini-button" type="button" data-copy-id="${message.id}" title="${escapeHtml(copyLabel)}" aria-label="${escapeHtml(copyLabel)}">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 4.8A2.8 2.8 0 0 1 10.8 2h5.4A2.8 2.8 0 0 1 19 4.8v8.4a2.8 2.8 0 0 1-2.8 2.8h-5.4A2.8 2.8 0 0 1 8 13.2V4.8Zm2.8-1a1 1 0 0 0-1 1v8.4a1 1 0 0 0 1 1h5.4a1 1 0 0 0 1-1V4.8a1 1 0 0 0-1-1h-5.4ZM5 8a.9.9 0 0 1 .9.9v8.3a3 3 0 0 0 3 3h5.2a.9.9 0 1 1 0 1.8H8.9A4.8 4.8 0 0 1 4.1 17.2V8.9A.9.9 0 0 1 5 8Z"/></svg>
             </button>
           </div>
         </header>
-        <div class="message-body">${markdownToHtml(message.raw, query)}</div>
+        <div class="message-body">${message.html}</div>
       </article>
     `;
   }).join('');
   observeVisibleMessages();
+}
+
+function applySearchHighlights(force = false) {
+  if (!force && state.highlightedQuery === state.normalizedQuery) return;
+
+  const affectedIds = new Set([
+    ...state.highlightedMessageIds,
+    ...state.matchingMessageIds
+  ]);
+
+  // Restore cached HTML before marking matches so removed or changed queries cannot leave stale highlights behind.
+  affectedIds.forEach((id) => {
+    const message = state.doc.messageById.get(id);
+    const body = document.getElementById(id)?.querySelector('.message-body');
+    if (!message || !body) return;
+
+    body.innerHTML = message.html;
+    if (state.matchingMessageIds.has(id)) highlightMessageBody(body, state.query);
+  });
+
+  state.highlightedMessageIds = new Set(state.matchingMessageIds);
+  state.highlightedQuery = state.normalizedQuery;
+}
+
+function highlightMessageBody(body, query) {
+  const textNodes = [];
+  const walker = document.createTreeWalker(body, globalThis.NodeFilter?.SHOW_TEXT || 4);
+  let node;
+  let offset = 0;
+
+  while ((node = walker.nextNode())) {
+    if (!node.nodeValue) continue;
+    textNodes.push({ node, start: offset, end: offset + node.nodeValue.length });
+    offset += node.nodeValue.length;
+  }
+
+  const matches = findNormalizedMatches(textNodes.map((item) => item.node.nodeValue).join(''), query);
+  let firstMatchIndex = 0;
+  textNodes.forEach((item) => {
+    while (firstMatchIndex < matches.length && matches[firstMatchIndex].end <= item.start) {
+      firstMatchIndex += 1;
+    }
+
+    const pieces = [];
+    for (let index = firstMatchIndex; index < matches.length && matches[index].start < item.end; index += 1) {
+      const match = matches[index];
+      const start = Math.max(item.start, match.start);
+      const end = Math.min(item.end, match.end);
+      if (start < end) pieces.push({ occurrence: index, start, end });
+    }
+    if (!pieces.length) return;
+
+    const fragment = document.createDocumentFragment();
+    const text = item.node.nodeValue;
+    let cursor = 0;
+    pieces.forEach((piece) => {
+      const start = piece.start - item.start;
+      const end = piece.end - item.start;
+      if (start > cursor) fragment.append(text.slice(cursor, start));
+      const mark = document.createElement('mark');
+      mark.dataset.searchOccurrence = String(piece.occurrence);
+      mark.textContent = text.slice(start, end);
+      fragment.append(mark);
+      cursor = end;
+    });
+    if (cursor < text.length) fragment.append(text.slice(cursor));
+    item.node.replaceWith(fragment);
+  });
+}
+
+function setCurrentSearchMark(result) {
+  els.conversation.querySelectorAll('mark.is-current').forEach((mark) => mark.classList.remove('is-current'));
+  const card = document.getElementById(result.messageId);
+  const mark = card?.querySelector(`mark[data-search-occurrence="${result.occurrence}"]`);
+  if (mark) mark.classList.add('is-current');
+  (mark || card)?.scrollIntoView({ behavior: scrollBehavior(), block: mark ? 'center' : 'start' });
 }
 
 function renderMessageNav(messages) {
@@ -993,6 +1229,7 @@ function createMessageNavItem(message) {
   button.className = `nav-item ${message.role} ${message.id === state.activeId ? 'is-active' : ''}`;
   button.type = 'button';
   button.dataset.messageId = message.id;
+  if (message.id === state.activeId) button.setAttribute('aria-current', 'location');
 
   const row = document.createElement('span');
   row.className = 'nav-row';
@@ -1007,7 +1244,7 @@ function createMessageNavItem(message) {
 
   const excerpt = document.createElement('span');
   excerpt.className = 'nav-excerpt';
-  excerpt.textContent = message.navExcerpt || message.plain || message.raw;
+  excerpt.textContent = (message.plain || message.raw).slice(0, NAV_EXCERPT_LENGTH);
 
   row.append(chip, turn);
   button.append(row, excerpt);
@@ -1015,6 +1252,7 @@ function createMessageNavItem(message) {
 }
 
 function scheduleRenderMessageNavWindow() {
+  // Coalesce scroll work into one frame while the virtual navigation list catches up.
   if (!navState.virtual || navState.frame) return;
   navState.frame = requestAnimationFrame(() => {
     navState.frame = null;
@@ -1062,10 +1300,12 @@ function renderMessageNavWindow() {
 }
 
 function participantLabel(message) {
-  return I18N[state.lang][message.role] || message.speaker || message.role;
+  const role = message.semanticRole || message.role;
+  return I18N[state.lang][role] || message.speaker || message.label || role;
 }
 
 function observeVisibleMessages() {
+  // Message cards are stable across search and filter changes, so observers are recreated only with card DOM.
   activeObserver?.disconnect();
   if (!('IntersectionObserver' in window)) return;
   activeObserver = new IntersectionObserver((entries) => {
@@ -1089,7 +1329,35 @@ function setActiveMessage(id) {
 
 function updateActiveNavItem() {
   els.messageList.querySelectorAll('.nav-item').forEach((item) => {
-    item.classList.toggle('is-active', item.dataset.messageId === state.activeId);
+    const active = item.dataset.messageId === state.activeId;
+    item.classList.toggle('is-active', active);
+    if (active) item.setAttribute('aria-current', 'location');
+    else item.removeAttribute('aria-current');
+  });
+}
+
+function handleMessageListKeydown(event) {
+  const button = event.target.closest('.nav-item');
+  if (!button || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  const currentIndex = navState.messages.findIndex((message) => message.id === button.dataset.messageId);
+  const nextIndex = nextMessageNavIndex(currentIndex, navState.messages.length, event.key);
+  if (nextIndex < 0) return;
+  event.preventDefault();
+  if (nextIndex === currentIndex) return;
+  focusMessageNavIndex(nextIndex);
+}
+
+function focusMessageNavIndex(index) {
+  const message = navState.messages[index];
+  if (!message) return;
+
+  if (navState.virtual) {
+    els.sidebarContent.scrollTop = Math.max(0, els.messageList.offsetTop + index * NAV_ROW_HEIGHT - NAV_ITEM_GAP);
+    renderMessageNavWindow();
+  }
+
+  requestAnimationFrame(() => {
+    els.messageList.querySelector(`[data-message-id="${message.id}"]`)?.focus({ preventScroll: true });
   });
 }
 
@@ -1099,23 +1367,24 @@ function renderStats(doc) {
   els.statChars.textContent = formatNumber(doc?.chars || 0);
 }
 
-function renderResultStatus(filtered) {
-  const total = state.doc?.messages.length || 0;
-  const shown = filtered.length;
-  const filtering = Boolean(state.query || state.role !== 'all');
-  els.resultLine.textContent = state.query
-    ? t('searchResults', { shown: formatNumber(shown), total: formatNumber(total) })
-    : (filtering ? t('visibleResults', { shown: formatNumber(shown), total: formatNumber(total) }) : t('searchResultsEmpty'));
-  const hasResults = filtering && shown > 0;
+function renderResultStatus(visible) {
+  const results = visibleSearchResults();
+  const filtering = state.role !== 'all';
+  const hasQuery = Boolean(state.normalizedQuery);
+  const current = state.searchIndex >= 0 ? state.searchIndex + 1 : 0;
+
+  els.resultLine.textContent = hasQuery
+    ? t('searchPosition', { current: formatNumber(current), total: formatNumber(results.length) })
+    : (filtering ? t('visibleResults', { shown: formatNumber(visible.length), total: formatNumber(state.doc?.messages.length || 0) }) : t('searchResultsEmpty'));
+
+  const hasResults = hasQuery && results.length > 0;
   els.prevResultBtn.disabled = !hasResults;
   els.nextResultBtn.disabled = !hasResults;
 }
 
 function clearSearch(options = {}) {
   clearTimeout(searchTimer);
-  els.searchInput.value = '';
-  state.query = '';
-  state.searchIndex = -1;
+  resetSearchState();
   if (options.resetRole) {
     els.roleFilter.value = 'all';
     state.role = 'all';
@@ -1124,41 +1393,36 @@ function clearSearch(options = {}) {
   els.searchInput.focus();
 }
 
-function requestResetDocument() {
+function requestCloseDocument() {
   if (!state.doc) return;
-  if (typeof els.resetDocumentDialog.showModal === 'function') {
-    els.resetDocumentDialog.showModal();
-    els.cancelResetDocumentBtn.focus();
-    return;
-  }
-  if (window.confirm(t('resetConfirmTitle'))) resetLoadedDocument();
+  if (showDialog(els.closeDocumentDialog, els.topCloseDocumentBtn, els.cancelCloseDocumentBtn)) return;
+  if (window.confirm(t('closeConfirmTitle'))) closeLoadedDocument();
 }
 
-function resetLoadedDocument() {
+function closeLoadedDocument() {
   activeObserver?.disconnect();
   state.doc = null;
-  state.query = '';
   state.role = 'all';
-  state.filteredIds = [];
-  state.searchIndex = -1;
   state.activeId = null;
-  els.searchInput.value = '';
+  resetSearchState();
   els.metaDetails.open = false;
   updateRoleFilter(null);
   render();
-  setStatus(t('resetComplete'));
-  showToast(t('resetComplete'));
+  setStatus(t('closeComplete'));
+  showToast(t('closeComplete'));
 }
 
 function jumpSearchResult(direction) {
-  if (!(state.query || state.role !== 'all') || !state.filteredIds.length) return;
-  const current = state.searchIndex >= 0 ? state.searchIndex : (direction > 0 ? -1 : 0);
-  state.searchIndex = (current + direction + state.filteredIds.length) % state.filteredIds.length;
-  const id = state.filteredIds[state.searchIndex];
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setActiveMessage(id);
-  scrollMessageNavToId(id);
+  const results = visibleSearchResults();
+  if (!results.length) return;
+
+  state.searchIndex = nextSearchIndex(state.searchIndex, results.length, direction);
+  const result = results[state.searchIndex];
+  setCurrentSearchMark(result);
+  setActiveMessage(result.messageId);
+  scrollMessageNavToId(result.messageId);
   setDrawerOpen(false);
+  renderResultStatus(visibleMessages());
 }
 
 function scrollMessageNavToId(id) {
@@ -1176,7 +1440,8 @@ function scrollMessageNavToId(id) {
     ?.scrollIntoView({ block: 'nearest' });
 }
 
-function markdownToHtml(markdown, highlightTerm = '') {
+function markdownToHtml(markdown) {
+  // Keep rendering deliberately small and safe for local logs; raw Markdown HTML is never interpreted.
   const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
   const html = [];
   const listStack = [];
@@ -1184,10 +1449,11 @@ function markdownToHtml(markdown, highlightTerm = '') {
   let inCode = false;
   let codeBuffer = [];
   let codeLanguage = '';
+  let codeFence = null;
 
   const closeParagraph = () => {
     if (!paragraph.length) return;
-    html.push(`<p>${inlineMarkdown(paragraph.join(' '), highlightTerm)}</p>`);
+    html.push(`<p>${inlineMarkdown(paragraph.join(' '))}</p>`);
     paragraph = [];
   };
 
@@ -1201,20 +1467,29 @@ function markdownToHtml(markdown, highlightTerm = '') {
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
-    const fence = line.match(/^```(.*)$/);
-    if (fence) {
+    const fence = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    const closesCodeFence = inCode
+      && fence
+      && fence[1][0] === codeFence.char
+      && fence[1].length >= codeFence.length
+      && !fence[2].trim();
+
+    if (!inCode && fence) {
       closeParagraph();
       closeAllLists();
-      if (inCode) {
-        const codeHtml = highlightHtml(escapeHtml(codeBuffer.join('\n')), highlightTerm);
-        html.push(`<pre><code${codeLanguage ? ` class="language-${escapeHtml(codeLanguage)}"` : ''}>${codeHtml}</code></pre>`);
-        inCode = false;
-        codeBuffer = [];
-        codeLanguage = '';
-      } else {
-        inCode = true;
-        codeLanguage = fence[1].trim().split(/\s+/)[0] || '';
-      }
+      inCode = true;
+      codeFence = { char: fence[1][0], length: fence[1].length };
+      codeLanguage = fence[2].trim().split(/\s+/)[0] || '';
+      continue;
+    }
+
+    if (closesCodeFence) {
+      const codeHtml = escapeHtml(codeBuffer.join('\n'));
+      html.push(`<pre><code${codeLanguage ? ` class="language-${escapeHtml(codeLanguage)}"` : ''}>${codeHtml}</code></pre>`);
+      inCode = false;
+      codeBuffer = [];
+      codeLanguage = '';
+      codeFence = null;
       continue;
     }
 
@@ -1241,7 +1516,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
       closeParagraph();
       closeAllLists();
       const level = Math.min(heading[1].length + 1, 6);
-      html.push(`<h${level}>${inlineMarkdown(heading[2].trim(), highlightTerm)}</h${level}>`);
+      html.push(`<h${level}>${inlineMarkdown(heading[2].trim())}</h${level}>`);
       continue;
     }
 
@@ -1249,7 +1524,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
     if (quote) {
       closeParagraph();
       closeAllLists();
-      html.push(`<blockquote>${inlineMarkdown(quote[1], highlightTerm)}</blockquote>`);
+      html.push(`<blockquote>${inlineMarkdown(quote[1])}</blockquote>`);
       continue;
     }
 
@@ -1266,7 +1541,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
         html.push(`<${type}>`);
         listStack.push({ indent, type });
       }
-      html.push(`<li>${inlineMarkdown(item[3], highlightTerm)}</li>`);
+      html.push(`<li>${inlineMarkdown(item[3])}</li>`);
       continue;
     }
 
@@ -1280,7 +1555,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
         index += 1;
       }
       index -= 1;
-      html.push(renderMarkdownTable(tableLines, highlightTerm));
+      html.push(renderMarkdownTable(tableLines));
       continue;
     }
 
@@ -1291,7 +1566,7 @@ function markdownToHtml(markdown, highlightTerm = '') {
   closeParagraph();
   closeAllLists();
   if (inCode) {
-    html.push(`<pre><code>${highlightHtml(escapeHtml(codeBuffer.join('\n')), highlightTerm)}</code></pre>`);
+    html.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`);
   }
 
   return html.join('\n');
@@ -1314,17 +1589,17 @@ function splitTableRow(line) {
     .map((cell) => cell.trim());
 }
 
-function renderMarkdownTable(lines, highlightTerm) {
+function renderMarkdownTable(lines) {
   const headers = splitTableRow(lines[0]);
   const rows = lines.slice(1).map(splitTableRow);
-  const head = `<thead><tr>${headers.map((cell) => `<th>${inlineMarkdown(cell, highlightTerm)}</th>`).join('')}</tr></thead>`;
+  const head = `<thead><tr>${headers.map((cell) => `<th>${inlineMarkdown(cell)}</th>`).join('')}</tr></thead>`;
   const body = rows.length
-    ? `<tbody>${rows.map((row) => `<tr>${headers.map((_, index) => `<td>${inlineMarkdown(row[index] || '', highlightTerm)}</td>`).join('')}</tr>`).join('')}</tbody>`
+    ? `<tbody>${rows.map((row) => `<tr>${headers.map((_, index) => `<td>${inlineMarkdown(row[index] || '')}</td>`).join('')}</tr>`).join('')}</tbody>`
     : '';
   return `<table>${head}${body}</table>`;
 }
 
-function inlineMarkdown(text, highlightTerm) {
+function inlineMarkdown(text) {
   const codeParts = text.split(/(`[^`]*`)/g);
   return codeParts.map((part) => {
     if (part.startsWith('`') && part.endsWith('`')) {
@@ -1345,9 +1620,6 @@ function inlineMarkdown(text, highlightTerm) {
       .replace(/_([^_]+)_/g, '<em>$1</em>');
     output = escaped.restore(output);
 
-    if (highlightTerm.trim()) {
-      output = highlightEscapedText(output, highlightTerm.trim());
-    }
     return output;
   }).join('');
 }
@@ -1365,32 +1637,8 @@ function protectMarkdownEscapes(text) {
   };
 }
 
-function highlightEscapedText(html, term) {
-  const safeTerm = escapeRegExp(escapeHtml(term));
-  if (!safeTerm) return html;
-  const regex = new RegExp(`(${safeTerm})`, 'gi');
-  return html.replace(/(<[^>]+>|[^<]+)/g, (segment) => {
-    if (segment.startsWith('<')) return segment;
-    return segment.replace(regex, '<mark>$1</mark>');
-  });
-}
-
-function highlightHtml(html, term) {
-  return term.trim() ? highlightEscapedText(html, term.trim()) : html;
-}
-
 function safeUrl(rawUrl) {
-  if (!rawUrl) return '';
-  try {
-    const cleaned = rawUrl.replace(/^['"]|['"]$/g, '');
-    if (cleaned.startsWith('#') || cleaned.startsWith('./') || cleaned.startsWith('../') || cleaned.startsWith('/')) {
-      return cleaned;
-    }
-    const url = new URL(cleaned, location.href);
-    return ['http:', 'https:', 'mailto:'].includes(url.protocol) ? url.href : '';
-  } catch {
-    return '';
-  }
+  return safeUrlForBase(rawUrl, location.href);
 }
 
 function escapeHtml(value) {
@@ -1408,16 +1656,12 @@ function unescapeHtml(value) {
   return textarea.value;
 }
 
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function normalizeForSearch(value) {
-  return String(value).normalize('NFKC').toLocaleLowerCase();
-}
-
 function formatNumber(value) {
-  return new Intl.NumberFormat(state.lang).format(value || 0);
+  if (numberFormatterLanguage !== state.lang) {
+    numberFormatter = new Intl.NumberFormat(state.lang);
+    numberFormatterLanguage = state.lang;
+  }
+  return numberFormatter.format(value || 0);
 }
 
 async function copyText(text) {
@@ -1445,7 +1689,30 @@ function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
   if (!['http:', 'https:'].includes(location.protocol)) return;
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch((error) => console.warn(error));
+    // Fetch update metadata freshly, but leave a waiting worker inactive until the user accepts it.
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+      .then((registration) => {
+        state.serviceWorkerRegistration = registration;
+        showServiceWorkerUpdate(registration);
+        registration.addEventListener('updatefound', () => {
+          const installingWorker = registration.installing;
+          if (!installingWorker) return;
+          installingWorker.addEventListener('statechange', () => {
+            if (installingWorker.state === 'installed') showServiceWorkerUpdate(registration);
+          });
+        });
+        registration.update().catch((error) => console.warn(error));
+      })
+      .catch((error) => console.warn(error));
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!shouldReloadAfterUpdate({
+      updateAccepted: state.updateAccepted,
+      reloadStarted: state.updateReloadStarted
+    })) return;
+
+    state.updateReloadStarted = true;
+    window.location.reload();
   });
 }
 
